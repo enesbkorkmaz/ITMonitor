@@ -243,7 +243,7 @@ namespace ITMonitor.View
         {
             try
             {
-                // 1. Dosya seçme penceresi aç
+
                 OpenFileDialog openFileDialog = new OpenFileDialog
                 {
                     Filter = "ITMonitor Yedek Dosyası (*.itm)|*.itm", // Sadece .itm dosyalarını göster

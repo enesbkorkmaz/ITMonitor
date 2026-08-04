@@ -13,4 +13,4 @@
         <SolidColorBrush x:Key="LogoColor" Color="#2D2D2D"/>
 
     </Application.Resources>
-</Application>
+</Application> 
