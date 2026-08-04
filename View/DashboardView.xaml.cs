@@ -37,6 +37,9 @@ namespace ITMonitor.View
 
         private async void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            // Sayfa her açıldığında kalıcı hafızadaki saati ekrana yazdır
+            TxtLastScan.Text = AppState.LastScanTime;
+
             await LoadDashboardStatsAsync();
         }
 
@@ -58,7 +61,11 @@ namespace ITMonitor.View
                 MonitoringService engine = new MonitoringService();
                 await Task.Run(() => engine.RunAllChecksAsync(AddLog));
 
-                TxtLastScan.Text = DateTime.Now.ToString("HH:mm");
+                // DEĞİŞTİRİLEN KISIM: Hem hafızaya hem ekrana yazıyoruz
+                string currentTime = DateTime.Now.ToString("HH:mm");
+                AppState.LastScanTime = currentTime;
+                TxtLastScan.Text = currentTime;
+
                 await LoadDashboardStatsAsync();
             }
             catch (Exception ex)
