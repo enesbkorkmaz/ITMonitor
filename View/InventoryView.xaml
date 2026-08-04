@@ -150,23 +150,50 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0" Margin="0,0,0,20">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="200"/>
-                    </Grid.ColumnDefinitions>
+               <Grid Grid.Row="0" Margin="0,0,0,20">
+     <Grid.ColumnDefinitions>
+         <ColumnDefinition Width="Auto"/> <ColumnDefinition Width="*"/>    <ColumnDefinition Width="Auto"/> <ColumnDefinition Width="200"/>  </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0" Text="📂 Envanter Listesi" Foreground="{DynamicResource AppText}" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>
+     <TextBlock Grid.Column="0" Text="📂 Envanter Listesi" Foreground="{DynamicResource AppText}" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>
 
-                    <Border Grid.Column="2" Background="{DynamicResource AppBackground}" CornerRadius="6" Padding="10,5" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1">
-                        <Grid>
-                            <TextBlock Text="🔍 Ara..." Foreground="{DynamicResource AppText}" Opacity="0.4" VerticalAlignment="Center" Margin="5,0"/>
-                            <TextBox x:Name="TxtSearch" TextChanged="TxtSearch_TextChanged" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" VerticalContentAlignment="Center"/>
-                        </Grid>
-                    </Border>
-                </Grid>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,15,0">
+                        <StackPanel.Resources>
+                            <Style TargetType="Button" x:Key="RoundedButton">
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </StackPanel.Resources>
 
+                        <Button Content="📥 İçe Aktar" 
+                 Width="90" Height="30" 
+                 Margin="0,0,10,0" 
+                 Click="BtnImport_Click" 
+                 Background="#2E8B57" 
+                 Style="{StaticResource RoundedButton}"/>
+
+                        <Button Content="📤 Dışa Aktar" 
+                 Width="90" Height="30" 
+                 Click="BtnExport_Click" 
+                 Background="#4682B4" 
+                 Style="{StaticResource RoundedButton}"/>
+                    </StackPanel>
+
+                    <Border Grid.Column="3" Background="{DynamicResource AppBackground}" CornerRadius="6" Padding="10,5" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1">
+         <Grid>
+             <TextBlock Text="🔍 Ara..." Foreground="{DynamicResource AppText}" Opacity="0.4" VerticalAlignment="Center" Margin="5,0"/>
+             <TextBox x:Name="TxtSearch" TextChanged="TxtSearch_TextChanged" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" VerticalContentAlignment="Center"/>
+         </Grid>
+     </Border>
+ </Grid>
                 <ListView Grid.Row="1" x:Name="DeviceListView" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource AppText}" ScrollViewer.HorizontalScrollBarVisibility="Auto">
                     <ListView.Resources>
                         <Style TargetType="ListViewItem">

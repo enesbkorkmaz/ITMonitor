@@ -6,6 +6,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Win32;
+using System.IO; 
+using System.Text.Json;
 
 namespace ITMonitor.View
 {
@@ -195,6 +198,98 @@ namespace ITMonitor.View
 
             FormTitleText.Text = "Cihaz Detayları";
             BtnSave.Content = "Kaydet";
+        }
+        private void BtnExport_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // 1. Veritabanından mevcut cihazları çek
+                using var db = new AppDbContext();
+                var devices = db.Devices.ToList();
+
+                if (devices.Count == 0)
+                {
+                    MessageBox.Show("Dışa aktarılacak cihaz bulunamadı!", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // 2. Kaydetme penceresi oluştur
+                SaveFileDialog saveFileDialog = new SaveFileDialog
+                {
+                    Filter = "ITMonitor Yedek Dosyası (*.itm)|*.itm", // Özel uzantımız!
+                    Title = "Envanteri Dışa Aktar",
+                    FileName = $"ITMonitor_Yedek_{DateTime.Now:yyyyMMdd_HHmmss}.itm" // Örn: ITMonitor_Yedek_20260804_153000.itm
+                };
+
+                // 3. Kullanıcı yeri seçip Kaydet'e basarsa:
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    // Verileri güzel ve okunaklı bir şekilde JSON metnine çevir
+                    var options = new JsonSerializerOptions { WriteIndented = true };
+                    string jsonString = JsonSerializer.Serialize(devices, options);
+
+                    // Metni dosyaya yazdır
+                    File.WriteAllText(saveFileDialog.FileName, jsonString);
+
+                    MessageBox.Show("Veriler başarıyla dışa aktarıldı!", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Dışa aktarılırken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        private void BtnImport_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // 1. Dosya seçme penceresi aç
+                OpenFileDialog openFileDialog = new OpenFileDialog
+                {
+                    Filter = "ITMonitor Yedek Dosyası (*.itm)|*.itm", // Sadece .itm dosyalarını göster
+                    Title = "Envanteri İçe Aktar"
+                };
+
+                // 2. Kullanıcı dosyayı seçip Tamam'a basarsa:
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    // Dosyadaki metni oku
+                    string jsonString = File.ReadAllText(openFileDialog.FileName);
+
+                    // Metni tekrar Cihaz (Device) listesine dönüştür
+                    var importedDevices = JsonSerializer.Deserialize<List<Device>>(jsonString);
+
+                    if (importedDevices != null && importedDevices.Count > 0)
+                    {
+                        using var db = new AppDbContext();
+
+                        foreach (var device in importedDevices)
+                        {
+                            // ÇOK ÖNEMLİ: Eski ID'leri sıfırlıyoruz. 
+                            // Veritabanı çakışmayı önlemek için otomatik yeni ID atayacaktır.
+                            device.Id = 0;
+
+                            db.Devices.Add(device);
+                        }
+
+                        // Veritabanına kaydet
+                        db.SaveChanges();
+
+                        // Arayüzdeki listeyi yenile (Kendi projendeki verileri yükleme metodunun adını buraya yaz, örn: LoadData() veya LoadDevices())
+                        // LoadDevices(); 
+
+                        MessageBox.Show($"{importedDevices.Count} cihaz başarıyla içe aktarıldı!", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Dosya boş veya uygun formatta değil.", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"İçe aktarılırken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

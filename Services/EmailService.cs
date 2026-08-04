@@ -23,14 +23,13 @@ namespace ITMonitor.Services
 
                 using (var context = new AppDbContext())
                 {
-                    // 1. SMTP Ayarlarını Kontrol Et
+
                     var settings = await context.SystemSettings.FirstOrDefaultAsync();
                     if (settings == null || string.IsNullOrWhiteSpace(settings.SmtpEmail) || string.IsNullOrWhiteSpace(settings.SmtpPassword))
                     {
                         return (false, "SMTP ayarları eksik! Lütfen Ayarlar sayfasından e-posta bilgilerinizi girin.");
                     }
 
-                    // 2. Alıcıları Çek ve Boş Adresleri Filtrele
                     var recipients = await context.Emails
                                                   .Where(e => !string.IsNullOrWhiteSpace(e.EmailAddress))
                                                   .ToListAsync();
@@ -40,7 +39,6 @@ namespace ITMonitor.Services
 
                     var offlineDevices = await context.Devices.Where(d => d.IsActive == false).ToListAsync();
 
-                    // 3. PDF Raporunu Oluştur
                     Document.Create(container =>
                     {
                         container.Page(page =>
@@ -58,7 +56,6 @@ namespace ITMonitor.Services
                         });
                     }).GeneratePdf(tempPdfPath);
 
-                    // 4. E-Postayı Hazırla
                     using (var mail = new MailMessage())
                     {
                         mail.From = new MailAddress(settings.SmtpEmail, "ITMonitor Sistem Raporu");
@@ -69,7 +66,6 @@ namespace ITMonitor.Services
                         mail.Subject = $"ITMonitor Güncel Durum Raporu - {DateTime.Now:dd.MM.yyyy HH:mm}";
                         mail.Body = $"Merhaba,\n\nITMonitor sistemi tarafından oluşturulan güncel ağ durum raporu PDF formatında ektedir.\n\nSistemde tespit edilen hatalı cihaz sayısı: {offlineDevices.Count}\n\nİyi çalışmalar.";
 
-                        // HATA DÜZELTME 2: Alıcı adresini eklerken boş olmadığını garantiye alıyoruz
                         foreach (var recipient in recipients)
                         {
                             if (!string.IsNullOrWhiteSpace(recipient.EmailAddress))
@@ -78,10 +74,8 @@ namespace ITMonitor.Services
                             }
                         }
 
-                        // PDF Ekini Ekle
                         mail.Attachments.Add(new Attachment(tempPdfPath));
 
-                        // SMTP Bağlantısı ve Gönderim
                         using (var smtp = new SmtpClient(settings.SmtpServer, settings.SmtpPort))
                         {
                             smtp.Credentials = new NetworkCredential(settings.SmtpEmail, settings.SmtpPassword);
@@ -91,7 +85,6 @@ namespace ITMonitor.Services
                     }
                 }
 
-                // Geçici PDF dosyasını temizle
                 if (File.Exists(tempPdfPath)) File.Delete(tempPdfPath);
 
                 return (true, "Rapor başarıyla tüm alıcılara gönderildi!");
