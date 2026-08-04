@@ -24,7 +24,7 @@ namespace ITMonitor.Models
 
         // YENİ EKLENEN ALANLAR:
         public long LastResponseTimeMs { get; set; } // Yanıt süresi (Milisaniye)
-        public string LastErrorCode { get; set; } = "OK"; // Hata Kodu / Durumu
+        public string? LastErrorCode { get; set; } = "OK"; // Hata Kodu / Durumu
 
     }
 }

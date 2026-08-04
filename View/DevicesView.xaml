@@ -63,9 +63,14 @@
                                                     <Ellipse.Style>
                                                         <Style TargetType="Ellipse">
                                                             <Setter Property="Fill" Value="#E74C3C"/>
+
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding IsActive}" Value="True">
                                                                     <Setter Property="Fill" Value="#2ECC71"/>
+                                                                </DataTrigger>
+
+                                                                <DataTrigger Binding="{Binding LastScanTime}" Value="{x:Null}">
+                                                                    <Setter Property="Fill" Value="#F1C40F"/>
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>

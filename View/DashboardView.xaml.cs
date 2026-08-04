@@ -91,6 +91,7 @@ namespace ITMonitor.View
         }
 
         // TÜM GRAFİKLERİ VE KRİTİK LİSTEYİ BESLEYEN ANA METOT
+        // TÜM GRAFİKLERİ VE KRİTİK LİSTEYİ BESLEYEN ANA METOT
         private async Task LoadDashboardStatsAsync()
         {
             using (var context = new AppDbContext())
@@ -98,15 +99,17 @@ namespace ITMonitor.View
                 var devices = await context.Devices.ToListAsync();
 
                 int total = devices.Count;
-                int active = devices.Count(d => d.IsActive);
-                int offline = total - active;
+
+                // DEĞİŞTİRİLEN KISIM: Sadece taranmış (LastScanTime dolu) olan cihazları say!
+                int active = devices.Count(d => d.IsActive && d.LastScanTime != null);
+                int offline = devices.Count(d => !d.IsActive && d.LastScanTime != null);
 
                 TxtTotalDevice.Text = total.ToString();
                 TxtActiveDevice.Text = active.ToString();
                 TxtOfflineDevice.Text = offline.ToString();
 
-                // 1. KRİTİK CİHAZLAR LİSTESİ (Sadece Pasif / Hatalı Olanlar)
-                var criticalDevices = devices.Where(d => !d.IsActive).ToList();
+                // 1. KRİTİK CİHAZLAR LİSTESİ (Sadece Taranmış ve Hatalı Olanlar)
+                var criticalDevices = devices.Where(d => !d.IsActive && d.LastScanTime != null).ToList();
                 CriticalDevicesControl.ItemsSource = criticalDevices;
 
                 // 2. PASTA GRAFİK (AĞ SAĞLIĞI)
@@ -129,6 +132,7 @@ namespace ITMonitor.View
                 };
 
                 // 3. ÇİZGİ GRAFİK (SON PİNG TRENLERİ)
+                // ... (Çizgi grafik kodların aynı kalacak, onlarda değişiklik yok)
                 var recentLogs = await context.DeviceLogs
                     .OrderByDescending(l => l.Timestamp)
                     .Take(10)
