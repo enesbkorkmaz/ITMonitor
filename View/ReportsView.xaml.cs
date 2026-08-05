@@ -121,92 +121,30 @@ namespace ITMonitor.View
 
             if (saveFileDialog.ShowDialog() == true)
             {
-                // Butonu geçici olarak kilitleyelim
                 BtnExportPdf.Content = "⏳ Oluşturuluyor...";
                 BtnExportPdf.IsEnabled = false;
 
                 try
                 {
-                    // QuestPDF topluluk lisansı bildirimi (Ücretsiz kullanım için gereklidir)
-                    QuestPDF.Settings.License = LicenseType.Community;
-
                     using (var context = new AppDbContext())
                     {
                         var offlineDevices = await context.Devices
                                                           .Where(d => d.IsActive == false)
                                                           .ToListAsync();
 
-                        // PDF Belgesini Tasarlıyoruz
-                        Document.Create(container =>
-                        {
-                            container.Page(page =>
-                            {
-                                page.Size(PageSizes.A4);
-                                page.Margin(2, Unit.Centimetre);
-                                page.PageColor(Colors.White);
-                                page.DefaultTextStyle(x => x.FontSize(11).FontFamily("Arial"));
-
-                                // PDF Başlığı (Header)
-                                page.Header().BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingBottom(5).Row(row =>
-                                {
-                                    row.RelativeItem().Column(col =>
-                                    {
-                                        col.Item().Text("ITMonitor Ağ Durum Raporu").SemiBold().FontSize(20).FontColor(Colors.Blue.Darken2);
-                                        col.Item().Text($"Oluşturulma Tarihi: {System.DateTime.Now:dd.MM.yyyy HH:mm}").FontSize(10).FontColor(Colors.Grey.Medium);
-                                    });
-                                });
-
-                                // PDF İçeriği (Content)
-                                page.Content().PaddingVertical(1, Unit.Centimetre).Column(x =>
-                                {
-                                    x.Spacing(15);
-
-                                    if (offlineDevices.Count == 0)
-                                    {
-                                        x.Item().Text("Tebrikler! Ağda bağlantısı kopan cihaz bulunmamaktadır.")
-                                            .FontSize(14).FontColor(Colors.Green.Medium);
-                                    }
-                                    else
-                                    {
-                                        x.Item().Text($"Toplam {offlineDevices.Count} cihazda sorun tespit edildi!")
-                                            .FontSize(14).FontColor(Colors.Red.Medium).Bold();
-
-                                        foreach (var device in offlineDevices)
-                                        {
-                                            x.Item().Background(Colors.Grey.Lighten4).Padding(10).Column(y =>
-                                            {
-                                                y.Spacing(2);
-                                                y.Item().Text($"Cihaz Adı: {device.Name} ({device.Category})").Bold().FontSize(12);
-                                                y.Item().Text($"IP / URL: {device.IpOrUrl}");
-                                                y.Item().Text($"Hata Detayı: {device.LastErrorCode}").FontColor(Colors.Red.Darken1);
-                                                y.Item().Text($"Son Tarama: {device.LastScanTime}");
-                                            });
-                                        }
-                                    }
-                                });
-
-                                // PDF Alt Bilgi (Footer) - Sayfa Numaraları
-                                page.Footer().AlignCenter().Text(x =>
-                                {
-                                    x.Span("Sayfa ");
-                                    x.CurrentPageNumber();
-                                    x.Span(" / ");
-                                    x.TotalPages();
-                                });
-                            });
-                        })
-                        .GeneratePdf(saveFileDialog.FileName); // PDF'i dosyaya yazdır
+                        // YENİ MERKEZİ SINIFIMIZI KULLANIYORUZ
+                        var pdfDocument = ITMonitor.Services.PdfReportGenerator.CreatePdfDocument(offlineDevices);
+                        pdfDocument.GeneratePdf(saveFileDialog.FileName);
                     }
 
-                    MessageBox.Show("Rapor başarıyla PDF olarak oluşturuldu!", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
+                    CustomMessageBox.Show("Rapor başarıyla PDF olarak oluşturuldu!", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (System.Exception ex)
                 {
-                    MessageBox.Show($"PDF oluşturulurken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+                    CustomMessageBox.Show($"PDF oluşturulurken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 finally
                 {
-                    // İşlem bittiğinde butonu eski haline getir
                     BtnExportPdf.Content = "📄 PDF Kaydet";
                     BtnExportPdf.IsEnabled = true;
                 }
@@ -245,21 +183,33 @@ namespace ITMonitor.View
             BtnSendEmail.Content = "⏳ Gönderiliyor...";
             BtnSendEmail.IsEnabled = false;
 
-            // Servisimizi çağırıyoruz
-            var emailService = new ITMonitor.Services.EmailService();
-            var result = await emailService.SendReportAsync();
-
-            if (result.isSuccess)
+            try
             {
-                MessageBox.Show(result.message, "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            else
-            {
-                MessageBox.Show(result.message, "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                // Servisimizi çağırıyoruz
+                var emailService = new ITMonitor.Services.EmailService();
+                var result = await emailService.SendReportAsync();
 
-            BtnSendEmail.Content = "📧 E-Posta Gönder";
-            BtnSendEmail.IsEnabled = true;
+                if (result.isSuccess)
+                {
+                    // Standart MessageBox yerine projenin özel CustomMessageBox'ını kullanıyoruz
+                    CustomMessageBox.Show(result.message, "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    CustomMessageBox.Show(result.message, "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                // Beklenmeyen sistem/ağ hatalarını yakalıyoruz
+                CustomMessageBox.Show($"E-posta gönderilirken beklenmeyen bir hata oluştu: {ex.Message}", "Kritik Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                // İşlem başarılı olsa da, hata verse de buton eski haline mutlaka dönecek
+                BtnSendEmail.Content = "📧 E-Posta Gönder";
+                BtnSendEmail.IsEnabled = true;
+            }
         }
     }
 }

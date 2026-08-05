@@ -87,35 +87,57 @@ namespace ITMonitor.View
         }
 
         // --- TÜM AYARLARI KAYDETME ---
+        // --- TÜM AYARLARI KAYDETME ---
         private async void BtnSaveSettings_Click(object sender, RoutedEventArgs e)
         {
-            using (var context = new AppDbContext())
+            BtnSaveSettings.Content = "⏳ Kaydediliyor...";
+            BtnSaveSettings.IsEnabled = false;
+
+            try
             {
-                var setting = await context.SystemSettings.FirstOrDefaultAsync();
-                if (setting == null)
+                using (var context = new AppDbContext())
                 {
-                    setting = new SystemSetting();
-                    context.SystemSettings.Add(setting);
+                    var setting = await context.SystemSettings.FirstOrDefaultAsync();
+                    if (setting == null)
+                    {
+                        setting = new SystemSetting();
+                        context.SystemSettings.Add(setting);
+                    }
+
+                    setting.AutoScanEnabled = ChkAutoScan.IsChecked ?? false;
+                    if (int.TryParse(TxtScanInterval.Text, out int scanInterval))
+                        setting.ScanIntervalMinutes = scanInterval;
+
+                    setting.IsAutoReportEnabled = ChkAutoReport.IsChecked ?? false;
+
+                    // HATA DÜZELTİLDİ: Menüden hiçbir şey seçilmemişse bile kod çökmeyecek
+                    var selectedType = CmbScheduleType.SelectedItem as ComboBoxItem;
+                    setting.ReportScheduleType = selectedType != null && selectedType.Tag != null
+                                                 ? selectedType.Tag.ToString()
+                                                 : "Interval"; // Varsayılan değer "Aralıklı"
+
+                    if (int.TryParse(TxtIntervalHours.Text, out int hours)) setting.ReportIntervalHours = hours;
+                    setting.ReportFixedTime = TxtFixedTime.Text;
+
+                    setting.SmtpServer = TxtSmtpServer.Text;
+                    if (int.TryParse(TxtSmtpPort.Text, out int port)) setting.SmtpPort = port;
+                    setting.SmtpEmail = TxtSenderEmail.Text;
+                    setting.SmtpPassword = TxtSenderPassword.Password;
+                    setting.UseSsl = true;
+
+                    await context.SaveChangesAsync();
+
+                    MessageBox.Show("Tüm ayarlar başarıyla kaydedildi!", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
-
-                setting.AutoScanEnabled = ChkAutoScan.IsChecked ?? false;
-                if (int.TryParse(TxtScanInterval.Text, out int scanInterval))
-                    setting.ScanIntervalMinutes = scanInterval;
-
-                setting.IsAutoReportEnabled = ChkAutoReport.IsChecked ?? false;
-                var selectedType = (ComboBoxItem)CmbScheduleType.SelectedItem;
-                setting.ReportScheduleType = selectedType.Tag.ToString()!;
-                if (int.TryParse(TxtIntervalHours.Text, out int hours)) setting.ReportIntervalHours = hours;
-                setting.ReportFixedTime = TxtFixedTime.Text;
-
-                setting.SmtpServer = TxtSmtpServer.Text;
-                if (int.TryParse(TxtSmtpPort.Text, out int port)) setting.SmtpPort = port;
-                setting.SmtpEmail = TxtSenderEmail.Text;
-                setting.SmtpPassword = TxtSenderPassword.Password;
-                setting.UseSsl = true;
-
-                await context.SaveChangesAsync();
-                MessageBox.Show("Tüm ayarlar başarıyla kaydedildi!", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show($"Ayarlar kaydedilirken bir veritabanı hatası oluştu!\n\nHata: {ex.InnerException?.Message ?? ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                BtnSaveSettings.Content = "💾 Tüm Ayarları Kaydet";
+                BtnSaveSettings.IsEnabled = true;
             }
         }
 
@@ -208,7 +230,7 @@ namespace ITMonitor.View
             }
         }
 
-        // --- YENİ EKLENEN: GİRİŞ ŞİFRESİ DEĞİŞTİRME ---
+        // --- GİRİŞ ŞİFRESİ DEĞİŞTİRME ---
         private async void BtnChangePassword_Click(object sender, RoutedEventArgs e)
         {
             string currentPass = TxtCurrentPassword.Password.Trim();
