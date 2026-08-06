@@ -1,8 +1,14 @@
 ﻿<UserControl x:Class="ITMonitor.View.DevicesView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:ITMonitor.Converters"
              Background="Transparent"
              Loaded="UserControl_Loaded">
+
+    <UserControl.Resources>
+        <conv:TonerPercentageConverter x:Key="TonerConverter"/>
+        <conv:TonerColorConverter x:Key="ColorConverter"/>
+    </UserControl.Resources>
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -32,7 +38,6 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
-
                     <TextBox x:Name="TxtSearch" TextChanged="TxtSearch_TextChanged" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" VerticalContentAlignment="Center"/>
                 </Grid>
             </Border>
@@ -57,18 +62,16 @@
 
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Width="160" Height="190" Background="{DynamicResource InputBackground}" CornerRadius="12" Margin="0,0,15,15" Padding="15,10">
+                                        <Border Width="180" Height="230" Background="{DynamicResource InputBackground}" CornerRadius="12" Margin="0,0,15,15" Padding="15,10">
                                             <Grid>
                                                 <Ellipse Width="12" Height="12" HorizontalAlignment="Right" VerticalAlignment="Top">
                                                     <Ellipse.Style>
                                                         <Style TargetType="Ellipse">
                                                             <Setter Property="Fill" Value="#E74C3C"/>
-
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding IsActive}" Value="True">
                                                                     <Setter Property="Fill" Value="#2ECC71"/>
                                                                 </DataTrigger>
-
                                                                 <DataTrigger Binding="{Binding LastScanTime}" Value="{x:Null}">
                                                                     <Setter Property="Fill" Value="#F1C40F"/>
                                                                 </DataTrigger>
@@ -108,10 +111,51 @@
                                                     </TextBlock.Style>
                                                 </TextBlock>
 
-                                                <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                                                <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="160">
                                                     <TextBlock Text="{Binding Name}" Foreground="{DynamicResource AppText}" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                                                     <TextBlock Text="{Binding IpOrUrl}" Foreground="{DynamicResource AppText}" Opacity="0.6" FontSize="11" HorizontalAlignment="Center" Margin="0,2,0,0"/>
-<TextBlock Text="{Binding Description}" Foreground="{DynamicResource AppText}" Opacity="0.5" FontSize="10" FontStyle="Italic" HorizontalAlignment="Center" Margin="0,2,0,0" TextTrimming="CharacterEllipsis" ToolTip="{Binding Description}"/>
+                                                    <TextBlock Text="{Binding Description}" Foreground="{DynamicResource AppText}" Opacity="0.5" FontSize="10" FontStyle="Italic" HorizontalAlignment="Center" Margin="0,2,0,0" TextTrimming="CharacterEllipsis" ToolTip="{Binding Description}"/>
+
+                                                    <Border Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="6" Margin="0,8,0,0" Height="22" ToolTip="{Binding LastErrorCode}">
+                                                        <Grid>
+                                                            <ProgressBar Minimum="0" Maximum="100" 
+                                                                         Value="{Binding LastErrorCode, Converter={StaticResource TonerConverter}}"
+                                                                         Foreground="{Binding LastErrorCode, Converter={StaticResource ColorConverter}}"
+                                                                         BorderThickness="0">
+                                                                <ProgressBar.Style>
+                                                                    <Style TargetType="ProgressBar">
+                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                        <Setter Property="Template">
+                                                                            <Setter.Value>
+                                                                                <ControlTemplate TargetType="ProgressBar">
+                                                                                    <Grid>
+                                                                                        <Border Background="Transparent" CornerRadius="5"/>
+                                                                                        <Rectangle x:Name="PART_Track" Fill="Transparent"/>
+
+                                                                                        <Decorator x:Name="PART_Indicator" HorizontalAlignment="Left">
+                                                                                            <Border Background="{TemplateBinding Foreground}" Opacity="0.8" CornerRadius="5"/>
+                                                                                        </Decorator>
+                                                                                    </Grid>
+                                                                                </ControlTemplate>
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding Category}" Value="Yazıcı">
+                                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </ProgressBar.Style>
+                                                            </ProgressBar>
+
+                                                            <TextBlock Text="{Binding LastErrorCode, TargetNullValue='Durum Bekleniyor...'}" 
+                                                                       Foreground="{DynamicResource AppText}" Opacity="0.9" 
+                                                                       FontSize="10" FontWeight="SemiBold" 
+                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                       TextTrimming="CharacterEllipsis"/>
+                                                        </Grid>
+                                                    </Border>
+
                                                     <TextBlock Foreground="{DynamicResource AppText}" Opacity="0.5" FontSize="10" HorizontalAlignment="Center" Margin="0,8,0,0">
                                                         <Run Text="Son Tarama: "/>
                                                         <Run Text="{Binding LastScanTime, StringFormat='dd.MM.yyyy HH:mm', TargetNullValue='Henüz taranmadı'}"/>

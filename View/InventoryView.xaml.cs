@@ -1,5 +1,6 @@
 ﻿using ITMonitor.Data;
 using ITMonitor.Models;
+using ITMonitor.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -289,6 +290,71 @@ namespace ITMonitor.View
             catch (Exception ex)
             {
                 MessageBox.Show($"İçe aktarılırken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        private async void BtnAutoDiscover_Click(object sender, RoutedEventArgs e)
+        {
+            // IP adresini al ve boşlukları temizle
+            string ipAddress = TxtIpOrUrl.Text.Trim();
+
+            if (string.IsNullOrEmpty(ipAddress))
+            {
+                MessageBox.Show("Lütfen tarama yapmak için önce bir IP adresi veya URL girin.", "Eksik Bilgi", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // UX (Kullanıcı Deneyimi): Kullanıcı art arda basmasın diye butonu dondur ve metni değiştir
+            BtnAutoDiscover.IsEnabled = false;
+            BtnAutoDiscover.Content = "⏳ Taranıyor...";
+
+            try
+            {
+                // 1. Motoru çağır ve asenkron taramayı başlat
+                SmartScanner scanner = new SmartScanner();
+                string detectedCategory = await scanner.DetectDeviceCategoryAsync(ipAddress);
+
+                // 2. Sonucu ekrandaki Kategori seçiciye (ComboBox) yaz.
+                CmbCategory.Text = detectedCategory;
+
+                // 3. YENİ KISIM: Kategoriye Göre İzleme Yöntemini Otomatik Seç
+                switch (detectedCategory)
+                {
+                    case "Windows Sunucu":
+                        CmbMethod.Text = "TCP - Uzak Masaüstü (3389)";
+                        break;
+                    case "Ağ Cihazı / Linux":
+                        CmbMethod.Text = "TCP - SSH (22)";
+                        break;
+                    case "Veritabanı":
+                        // Veritabanıysa varsayılan olarak en popüler olan MSSQL (1433) seçilsin
+                        CmbMethod.Text = "TCP - SQL Server (1433)";
+                        break;
+                    case "Web Servisi":
+                        CmbMethod.Text = "HTTP / HTTPS (Web)";
+                        break;
+                    case "Yazıcı":
+                        CmbMethod.Text = "TCP - Yazıcı (9100)";
+                        break;
+                    default:
+                        CmbMethod.Text = "Ping (ICMP)"; // Bulamazsa klasik ping
+                        break;
+                }
+
+                // 4. (Bonus) Eğer Cihaz Adı kutusu boşsa, oraya da geçici bir isim önerelim
+                if (string.IsNullOrEmpty(TxtDeviceName.Text))
+                {
+                    TxtDeviceName.Text = $"{detectedCategory} ({ipAddress})";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Tarama sırasında beklenmeyen bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                // 5. İşlem bitince (başarılı da olsa hata da verse) butonu eski haline getir
+                BtnAutoDiscover.IsEnabled = true;
+                BtnAutoDiscover.Content = "🔍 Otomatik Tanı";
             }
         }
     }

@@ -6,7 +6,7 @@ using System.Net.Mail;
 using System.Threading.Tasks;
 using ITMonitor.Data;
 using Microsoft.EntityFrameworkCore;
-using QuestPDF.Fluent; // PdfReportGenerator'dan dönen nesneyi GeneratePdf() yapabilmek için gerekli
+using QuestPDF.Fluent; 
 
 namespace ITMonitor.Services
 {
@@ -17,17 +17,13 @@ namespace ITMonitor.Services
             try
             {
                 // 1. ADIM: RAPOR ÖNCESİ SİSTEMİ GÜNCELLE (TAZE VERİ)
-                // Rapor gönderilmeden hemen önce güncel durumu öğrenmek için cihazlara ping/tarama atıyoruz.
                 try
                 {
-                    // NOT: Eğer projendeki ping atma servisinin adı MonitoringService değilse 
-                    // veya metot adı ScanAllDevicesAsync değilse burayı kendi projene göre düzenleyebilirsin.
                     var monitoringService = new ITMonitor.Services.MonitoringService();
                     await monitoringService.RunAllChecksAsync();
                 }
                 catch (Exception scanEx)
                 {
-                    // Tarama sırasında bir hata olursa e-posta gönderimi iptal olmasın diye sadece Console'a yazdırıyoruz.
                     Console.WriteLine($"E-posta öncesi tarama yapılamadı: {scanEx.Message}");
                 }
 
@@ -61,7 +57,7 @@ namespace ITMonitor.Services
                     // 5. ADIM: E-POSTA İÇERİĞİNİ HAZIRLA VE GÖNDER
                     using (var mail = new MailMessage())
                     {
-                        mail.From = new MailAddress(settings.SmtpEmail, "ITMonitor Sistem Raporu");
+                        mail.From = new MailAddress(settings.SmtpEmail, "ITMonitor Tarama Raporu");
 
                         // To (Ana alıcı) alanının boş kalmaması için gönderici adresini yazıyoruz
                         mail.To.Add(settings.SmtpEmail);
@@ -69,7 +65,7 @@ namespace ITMonitor.Services
                         mail.Subject = $"ITMonitor Güncel Durum Raporu - {DateTime.Now:dd.MM.yyyy HH:mm}";
                         mail.Body = $"Merhaba,\n\nITMonitor sistemi tarafından oluşturulan güncel ağ durum raporu detaylı tablo formatında (PDF) ektedir.\n\nSistemde tespit edilen hatalı cihaz sayısı: {offlineDevices.Count}\n\nİyi çalışmalar.";
 
-                        // Veritabanındaki tüm alıcıları BCC (Gizli kopya) olarak ekliyoruz
+                        // Veritabanındaki tüm alıcıları BCC (Gizli kopya) olarak ekle
                         foreach (var recipient in recipients)
                         {
                             if (!string.IsNullOrWhiteSpace(recipient.EmailAddress))

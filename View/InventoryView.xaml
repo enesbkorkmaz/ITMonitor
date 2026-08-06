@@ -150,11 +150,15 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-               <Grid Grid.Row="0" Margin="0,0,0,20">
-     <Grid.ColumnDefinitions>
-         <ColumnDefinition Width="Auto"/> <ColumnDefinition Width="*"/>    <ColumnDefinition Width="Auto"/> <ColumnDefinition Width="200"/>  </Grid.ColumnDefinitions>
+                <Grid Grid.Row="0" Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="200"/>
+                    </Grid.ColumnDefinitions>
 
-     <TextBlock Grid.Column="0" Text="📂 Envanter Listesi" Foreground="{DynamicResource AppText}" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="0" Text="📂 Envanter Listesi" Foreground="{DynamicResource AppText}" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>
 
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,15,0">
                         <StackPanel.Resources>
@@ -174,26 +178,27 @@
                         </StackPanel.Resources>
 
                         <Button Content="📥 İçe Aktar" 
-                 Width="90" Height="30" 
-                 Margin="0,0,10,0" 
-                 Click="BtnImport_Click" 
-                 Background="#2E8B57" 
-                 Style="{StaticResource RoundedButton}"/>
+                                Width="90" Height="30" 
+                                Margin="0,0,10,0" 
+                                Click="BtnImport_Click" 
+                                Background="#2E8B57" 
+                                Style="{StaticResource RoundedButton}"/>
 
                         <Button Content="📤 Dışa Aktar" 
-                 Width="90" Height="30" 
-                 Click="BtnExport_Click" 
-                 Background="#4682B4" 
-                 Style="{StaticResource RoundedButton}"/>
+                                Width="90" Height="30" 
+                                Click="BtnExport_Click" 
+                                Background="#4682B4" 
+                                Style="{StaticResource RoundedButton}"/>
                     </StackPanel>
 
                     <Border Grid.Column="3" Background="{DynamicResource AppBackground}" CornerRadius="6" Padding="10,5" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1">
-         <Grid>
-             <TextBlock Text="🔍 Ara..." Foreground="{DynamicResource AppText}" Opacity="0.4" VerticalAlignment="Center" Margin="5,0"/>
-             <TextBox x:Name="TxtSearch" TextChanged="TxtSearch_TextChanged" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" VerticalContentAlignment="Center"/>
-         </Grid>
-     </Border>
- </Grid>
+                        <Grid>
+                            <TextBlock Text="🔍 Ara..." Foreground="{DynamicResource AppText}" Opacity="0.4" VerticalAlignment="Center" Margin="5,0"/>
+                            <TextBox x:Name="TxtSearch" TextChanged="TxtSearch_TextChanged" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" VerticalContentAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+
                 <ListView Grid.Row="1" x:Name="DeviceListView" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource AppText}" ScrollViewer.HorizontalScrollBarVisibility="Auto">
                     <ListView.Resources>
                         <Style TargetType="ListViewItem">
@@ -210,9 +215,7 @@
                             <GridViewColumn Header="IP / URL" Width="120" DisplayMemberBinding="{Binding IpOrUrl}"/>
                             <GridViewColumn Header="Kategori" Width="100" DisplayMemberBinding="{Binding Category}"/>
                             <GridViewColumn Header="Yöntem" Width="60" DisplayMemberBinding="{Binding Method}"/>
-
                             <GridViewColumn Header="Görev/Açıklama" Width="150" DisplayMemberBinding="{Binding Description}"/>
-
                             <GridViewColumn Header="İşlemler" Width="160">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
@@ -264,10 +267,37 @@
                 </Border>
 
                 <TextBlock Text="IP Adresi veya URL" Foreground="{DynamicResource AppText}" Opacity="0.7" FontSize="12" FontWeight="Medium" Margin="0,0,0,5"/>
-                <Border Background="{DynamicResource AppBackground}" CornerRadius="6" Height="35" Margin="0,0,0,15" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1">
-                    <TextBox x:Name="TxtIpOrUrl" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" Padding="10,0" VerticalContentAlignment="Center"/>
-                </Border>
+                <Grid Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
+                    <Border Grid.Column="0" Background="{DynamicResource AppBackground}" CornerRadius="6" Height="35" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" Margin="0,0,8,0">
+                        <TextBox x:Name="TxtIpOrUrl" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" Padding="10,0" VerticalContentAlignment="Center"/>
+                    </Border>
+
+                    <Button Grid.Column="1" x:Name="BtnAutoDiscover" Click="BtnAutoDiscover_Click" Content="🔍 Otomatik Tanı" Height="35" Padding="12,0" Background="#FF9500" Foreground="White" FontWeight="SemiBold" FontSize="12" BorderThickness="0" Cursor="Hand">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="btnBorder" Background="{TemplateBinding Background}" CornerRadius="6">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="btnBorder" Property="Background" Value="#FFB347"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Grid>
                 <TextBlock Text="Kategori" Foreground="{DynamicResource AppText}" Opacity="0.7" FontSize="12" FontWeight="Medium" Margin="0,0,0,5"/>
                 <ComboBox x:Name="CmbCategory" Margin="0,0,0,15">
                     <ComboBoxItem Content="Sunucu" IsSelected="True"/>
@@ -282,8 +312,15 @@
 
                 <TextBlock Text="İzleme Yöntemi" Foreground="{DynamicResource AppText}" Opacity="0.7" FontSize="12" FontWeight="Medium" Margin="0,0,0,5"/>
                 <ComboBox x:Name="CmbMethod" Margin="0,0,0,15">
-                    <ComboBoxItem Content="Ping" IsSelected="True"/>
-                    <ComboBoxItem Content="HTTP"/>
+                    <ComboBoxItem Content="Ping (ICMP)" IsSelected="True"/>
+                    <ComboBoxItem Content="HTTP / HTTPS (Web)"/>
+                    <ComboBoxItem Content="TCP - SQL Server (1433)"/>
+                    <ComboBoxItem Content="TCP - PostgreSQL (5432)"/>
+                    <ComboBoxItem Content="TCP - MySQL (3306)"/>
+                    <ComboBoxItem Content="TCP - Uzak Masaüstü (3389)"/>
+                    <ComboBoxItem Content="TCP - SSH (22)"/>
+                    <ComboBoxItem Content="TCP - Yazıcı (9100)"/>
+                    <ComboBoxItem Content="SNMP (v1/v2c)"/>
                 </ComboBox>
 
                 <TextBlock Text="Görev / Açıklama" Foreground="{DynamicResource AppText}" Opacity="0.7" FontSize="12" FontWeight="Medium" Margin="0,0,0,5"/>
