@@ -24,21 +24,53 @@ namespace ITMonitor.View
         {
             InitializeComponent();
             DataContext = this;
-            SetupTimer();
+            // DİKKAT: SetupTimer() buradan silindi. Artık sayfa yüklendiğinde (Loaded) çağrılacak.
         }
 
-        private void SetupTimer()
+        // YENİ EKLENEN: Ayarlara Göre Dinamik Çalışan Timer
+        private async Task SetupTimerAsync()
         {
-            _scanTimer = new DispatcherTimer();
-            _scanTimer.Interval = TimeSpan.FromMinutes(5);
-            _scanTimer.Tick += async (s, e) => await RunScanAsync();
-            _scanTimer.Start();
+            // 1. Eğer halihazırda çalışan bir timer varsa durdur 
+            if (_scanTimer != null)
+            {
+                _scanTimer.Stop();
+            }
+
+            try
+            {
+                using (var context = new AppDbContext())
+                {
+                    var settings = await context.SystemSettings.FirstOrDefaultAsync();
+
+                    // 2. Ayar yoksa veya Otomatik Tarama KAPALIYSA hiç başlatmadan çık
+                    if (settings == null || !settings.AutoScanEnabled)
+                        return;
+
+                    // 3. Otomatik tarama AÇIKSA, süreyi veritabanından çek ve kur
+                    _scanTimer = new DispatcherTimer();
+                    _scanTimer.Interval = TimeSpan.FromMinutes(settings.ScanIntervalMinutes);
+                    _scanTimer.Tick += async (s, e) =>
+                    {
+                        // Timer tetiklendiğinde arayüzdeki Taramayı Başlat metodunu çağır
+                        await RunScanAsync();
+                    };
+                    _scanTimer.Start();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Hata durumunda log ekranına düşsün
+                AddLog($"[{DateTime.Now:HH:mm:ss}] ⚠️ Timer Hatası: {ex.Message}");
+            }
         }
 
         private async void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             // Sayfa her açıldığında kalıcı hafızadaki saati ekrana yazdır
             TxtLastScan.Text = AppState.LastScanTime;
+
+            // Veritabanındaki güncel ayarlara göre Timer'ı kur veya iptal et
+            await SetupTimerAsync();
 
             await LoadDashboardStatsAsync();
         }
@@ -61,7 +93,7 @@ namespace ITMonitor.View
                 MonitoringService engine = new MonitoringService();
                 await Task.Run(() => engine.RunAllChecksAsync(AddLog));
 
-                // DEĞİŞTİRİLEN KISIM: Hem hafızaya hem ekrana yazıyoruz
+                // Hem hafızaya hem ekrana yazıyoruz
                 string currentTime = DateTime.Now.ToString("HH:mm");
                 AppState.LastScanTime = currentTime;
                 TxtLastScan.Text = currentTime;
@@ -91,7 +123,6 @@ namespace ITMonitor.View
         }
 
         // TÜM GRAFİKLERİ VE KRİTİK LİSTEYİ BESLEYEN ANA METOT
-        // TÜM GRAFİKLERİ VE KRİTİK LİSTEYİ BESLEYEN ANA METOT
         private async Task LoadDashboardStatsAsync()
         {
             using (var context = new AppDbContext())
@@ -100,7 +131,7 @@ namespace ITMonitor.View
 
                 int total = devices.Count;
 
-                // DEĞİŞTİRİLEN KISIM: Sadece taranmış (LastScanTime dolu) olan cihazları say!
+
                 int active = devices.Count(d => d.IsActive && d.LastScanTime != null);
                 int offline = devices.Count(d => !d.IsActive && d.LastScanTime != null);
 
@@ -132,7 +163,6 @@ namespace ITMonitor.View
                 };
 
                 // 3. ÇİZGİ GRAFİK (SON PİNG TRENLERİ)
-                // ... (Çizgi grafik kodların aynı kalacak, onlarda değişiklik yok)
                 var recentLogs = await context.DeviceLogs
                     .OrderByDescending(l => l.Timestamp)
                     .Take(10)
