@@ -8,6 +8,119 @@
              Background="Transparent"
              Loaded="UserControl_Loaded">
 
+    <!-- TÜM SAYFADA KULLANILACAK MODERN TASARIM ŞABLONLARI -->
+    <UserControl.Resources>
+
+        <!-- YUVARLAK VE MODERN BUTON ŞABLONU -->
+        <Style TargetType="Button" x:Key="FlatRoundedButton">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="btnBorder" Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Opacity" Value="0.85"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="btnBorder" Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- MODERN COMBOBOX ŞABLONU -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="{DynamicResource AppBackground}"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppText}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AppBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6">
+                            <Grid>
+                                <ToggleButton x:Name="ToggleButton" Background="Transparent" BorderThickness="0" Focusable="false" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press">
+                                    <ToggleButton.Template>
+                                        <ControlTemplate TargetType="ToggleButton">
+                                            <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                                                <TextBlock Text="▼" Foreground="{DynamicResource AppText}" FontSize="10" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0" Opacity="0.6"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </ToggleButton.Template>
+                                </ToggleButton>
+                                <ContentPresenter x:Name="ContentSite" IsHitTestVisible="False" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" Margin="{TemplateBinding Padding}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <Popup x:Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
+                                    <Border Background="{DynamicResource InputBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="6" Margin="0,4,0,0" MinWidth="{TemplateBinding ActualWidth}">
+                                        <ScrollViewer Margin="2">
+                                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                        </ScrollViewer>
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppText}"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#15888888"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#30007AFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- MODERN TABLO BAŞLIĞI ŞABLONU (Envanter sayfasından uyarlandı) -->
+        <Style TargetType="GridViewColumnHeader">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppText}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GridViewColumnHeader">
+                        <Border Background="{DynamicResource AppBackground}" 
+                                BorderBrush="{DynamicResource AppBorder}" 
+                                BorderThickness="0,0,0,1" 
+                                CornerRadius="6" 
+                                Padding="{TemplateBinding Padding}"
+                                Margin="0,0,2,5">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </UserControl.Resources>
+
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid Margin="20">
             <Grid.RowDefinitions>
@@ -15,6 +128,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
+            <!-- BAŞLIK -->
             <StackPanel Grid.Row="0" Margin="0,0,0,20">
                 <TextBlock Text="⚙️ Sistem ve Otomasyon Ayarları" FontSize="26" FontWeight="Bold" Foreground="{DynamicResource AppText}"/>
                 <TextBlock Text="Ağ tarama periyotlarını, e-posta otomasyonunu, SMTP ve hesap şifrenizi yönetin." 
@@ -28,17 +142,23 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
+                <!-- SOL SÜTUN -->
                 <StackPanel Grid.Column="0">
 
+                    <!-- OTOMATİK TARAMA -->
                     <Border Background="{DynamicResource InputBackground}" CornerRadius="12" Padding="20" Margin="0,0,0,15">
                         <StackPanel>
                             <TextBlock Text="🔍 Otomatik Ağ Taraması" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppText}" Margin="0,0,0,15"/>
-                            <CheckBox x:Name="ChkAutoScan" Content="Otomatik Ağ Taramasını Aktifleştir" Foreground="{DynamicResource AppText}" FontSize="14" Margin="0,0,0,10"/>
+                            <CheckBox x:Name="ChkAutoScan" Content="Otomatik Ağ Taramasını Aktifleştir" Foreground="{DynamicResource AppText}" FontSize="14" Margin="0,0,0,15"/>
+
                             <TextBlock Text="Tarama Aralığı (Dakika):" Foreground="{DynamicResource AppText}" Margin="0,0,0,5"/>
-                            <TextBox x:Name="TxtScanInterval" Text="30" Padding="8" Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}"/>
+                            <Border Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="6" Height="35">
+                                <TextBox x:Name="TxtScanInterval" Text="30" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" Padding="10,0" VerticalContentAlignment="Center"/>
+                            </Border>
                         </StackPanel>
                     </Border>
 
+                    <!-- OTOMATİK RAPORLAMA -->
                     <Border Background="{DynamicResource InputBackground}" CornerRadius="12" Padding="20" Margin="0,0,0,15">
                         <StackPanel>
                             <TextBlock Text="📅 Otomatik Raporlama" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppText}" Margin="0,0,0,15"/>
@@ -46,62 +166,65 @@
 
                             <StackPanel x:Name="SchedulePanel" IsEnabled="False">
                                 <TextBlock Text="Gönderim Tipi:" Foreground="{DynamicResource AppText}" Margin="0,0,0,5"/>
-                                <ComboBox x:Name="CmbScheduleType" Margin="0,0,0,15" Padding="5" SelectionChanged="CmbScheduleType_SelectionChanged">
+                                <ComboBox x:Name="CmbScheduleType" Margin="0,0,0,15" SelectionChanged="CmbScheduleType_SelectionChanged">
                                     <ComboBoxItem Content="Aralıklı (Örn: 2 saatte bir)" Tag="Interval"/>
                                     <ComboBoxItem Content="Sabit Saat (Örn: 08:00)" Tag="FixedTime"/>
                                 </ComboBox>
 
                                 <StackPanel x:Name="IntervalPanel" Visibility="Visible">
                                     <TextBlock Text="Kaç Saatte Bir Gönderilsin?" Foreground="{DynamicResource AppText}" Margin="0,0,0,5"/>
-                                    <TextBox x:Name="TxtIntervalHours" Text="1" Padding="8" Margin="0,0,0,15" Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}"/>
+                                    <Border Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="6" Height="35" Margin="0,0,0,15">
+                                        <TextBox x:Name="TxtIntervalHours" Text="1" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" Padding="10,0" VerticalContentAlignment="Center"/>
+                                    </Border>
                                 </StackPanel>
 
                                 <StackPanel x:Name="FixedTimePanel" Visibility="Collapsed">
                                     <TextBlock Text="Gönderim Saati (SS:DD):" Foreground="{DynamicResource AppText}" Margin="0,0,0,5"/>
-                                    <TextBox x:Name="TxtFixedTime" Text="17:00" Padding="8" Margin="0,0,0,15" Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}"/>
+                                    <Border Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="6" Height="35" Margin="0,0,0,15">
+                                        <TextBox x:Name="TxtFixedTime" Text="17:00" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" Padding="10,0" VerticalContentAlignment="Center"/>
+                                    </Border>
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>
                     </Border>
 
+                    <!-- SMTP AYARLARI -->
                     <Border Background="{DynamicResource InputBackground}" CornerRadius="12" Padding="20" Margin="0,0,0,20">
                         <StackPanel>
                             <TextBlock Text="✉️ SMTP Sunucu Ayarları" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppText}" Margin="0,0,0,15"/>
 
                             <TextBlock Text="SMTP Sunucusu:" Foreground="{DynamicResource AppText}" Margin="0,0,0,5"/>
-                            <TextBox x:Name="TxtSmtpServer" Padding="8" Margin="0,0,0,10" Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}"/>
+                            <Border Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="6" Height="35" Margin="0,0,0,10">
+                                <TextBox x:Name="TxtSmtpServer" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" Padding="10,0" VerticalContentAlignment="Center"/>
+                            </Border>
 
                             <TextBlock Text="Port:" Foreground="{DynamicResource AppText}" Margin="0,0,0,5"/>
-                            <TextBox x:Name="TxtSmtpPort" Padding="8" Margin="0,0,0,10" Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}"/>
+                            <Border Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="6" Height="35" Margin="0,0,0,10">
+                                <TextBox x:Name="TxtSmtpPort" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" Padding="10,0" VerticalContentAlignment="Center"/>
+                            </Border>
 
                             <TextBlock Text="Gönderici E-Posta:" Foreground="{DynamicResource AppText}" Margin="0,0,0,5"/>
-                            <TextBox x:Name="TxtSenderEmail" Padding="8" Margin="0,0,0,10" Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}"/>
+                            <Border Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="6" Height="35" Margin="0,0,0,10">
+                                <TextBox x:Name="TxtSenderEmail" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" Padding="10,0" VerticalContentAlignment="Center"/>
+                            </Border>
 
                             <TextBlock Text="Uygulama Şifresi:" Foreground="{DynamicResource AppText}" Margin="0,0,0,5"/>
-                            <PasswordBox x:Name="TxtSenderPassword" Padding="8" Margin="0,0,0,15" Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}"/>
+                            <Border Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="6" Height="35" Margin="0,0,0,15">
+                                <PasswordBox x:Name="TxtSenderPassword" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" Padding="10,0" VerticalContentAlignment="Center"/>
+                            </Border>
 
-                            <Button x:Name="BtnTestEmail" Content="🧪 Test Et" Click="BtnTestEmail_Click" Height="40" Background="#F39C12" Foreground="White" BorderThickness="0">
-                                <Button.Resources>
-                                    <Style TargetType="Border">
-                                        <Setter Property="CornerRadius" Value="8"/>
-                                    </Style>
-                                </Button.Resources>
-                            </Button>
+                            <Button x:Name="BtnTestEmail" Content="🧪 Test Et" Click="BtnTestEmail_Click" Height="40" Background="#F39C12" Style="{StaticResource FlatRoundedButton}"/>
                         </StackPanel>
                     </Border>
 
-                    <Button x:Name="BtnSaveSettings" Content="💾 Tüm Ayarları Kaydet" Click="BtnSaveSettings_Click" Height="45" Background="#2ECC71" Foreground="White" FontSize="15" FontWeight="Bold" BorderThickness="0">
-                        <Button.Resources>
-                            <Style TargetType="Border">
-                                <Setter Property="CornerRadius" Value="8"/>
-                            </Style>
-                        </Button.Resources>
-                    </Button>
+                    <Button x:Name="BtnSaveSettings" Content="💾 Tüm Ayarları Kaydet" Click="BtnSaveSettings_Click" Height="45" Background="#2ECC71" FontSize="15" FontWeight="Bold" Style="{StaticResource FlatRoundedButton}"/>
 
                 </StackPanel>
 
+                <!-- SAĞ SÜTUN -->
                 <StackPanel Grid.Column="2">
 
+                    <!-- ALICI LİSTESİ -->
                     <Border Background="{DynamicResource InputBackground}" CornerRadius="12" Padding="20" Margin="0,0,0,15">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -121,62 +244,80 @@
                                     <ColumnDefinition Width="70"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBox x:Name="TxtNewEmailName" Grid.Column="0" Padding="8" Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}" Text="Ad Soyad"/>
-                                <TextBox x:Name="TxtNewEmailAddress" Grid.Column="2" Padding="8" Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}" Text="eposta@adres.com"/>
+                                <Border Grid.Column="0" Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="6" Height="35">
+                                    <TextBox x:Name="TxtNewEmailName" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" Padding="10,0" VerticalContentAlignment="Center" Text="Ad Soyad"/>
+                                </Border>
 
-                                <Button x:Name="BtnAddEmail" Grid.Column="4" Content="Ekle" Click="BtnAddEmail_Click" Background="#3498DB" Foreground="White" BorderThickness="0">
-                                    <Button.Resources>
-                                        <Style TargetType="Border">
-                                            <Setter Property="CornerRadius" Value="6"/>
-                                        </Style>
-                                    </Button.Resources>
-                                </Button>
+                                <Border Grid.Column="2" Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="6" Height="35">
+                                    <TextBox x:Name="TxtNewEmailAddress" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" Padding="10,0" VerticalContentAlignment="Center" Text="eposta@adres.com"/>
+                                </Border>
+
+                                <Button x:Name="BtnAddEmail" Grid.Column="4" Content="Ekle" Click="BtnAddEmail_Click" Background="#3498DB" Height="35" Style="{StaticResource FlatRoundedButton}"/>
                             </Grid>
 
-                            <ListView x:Name="EmailList" Grid.Row="2" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource AppText}" MinHeight="200" MaxHeight="250">
+                            <!-- LİSTE YAPISI -->
+                            <ListView x:Name="EmailList" Grid.Row="2" Background="Transparent" BorderThickness="0" MinHeight="200" MaxHeight="250" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                                <ListView.Resources>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="Foreground" Value="{DynamicResource AppText}"/>
+                                        <Setter Property="Margin" Value="0,3"/>
+                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                    </Style>
+                                </ListView.Resources>
                                 <ListView.View>
                                     <GridView>
                                         <GridViewColumn Header="Ad Soyad" Width="130" DisplayMemberBinding="{Binding Name}"/>
-                                        <GridViewColumn Header="E-Posta Adresi" Width="170" DisplayMemberBinding="{Binding EmailAddress}"/>
-                                        <GridViewColumn Header="İşlem" Width="70">
+                                        <GridViewColumn Header="E-Posta Adresi" Width="190" DisplayMemberBinding="{Binding EmailAddress}"/>
+
+                                        <!-- ENVANTER SAYFASINDAN UYARLANAN SİL BUTONU -->
+                                        <GridViewColumn Header="İşlemler" Width="100">
                                             <GridViewColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <Button Content="Sil" Tag="{Binding Id}" Click="BtnDeleteEmail_Click" Background="#E74C3C" Foreground="White" Padding="8,2" BorderThickness="0">
+                                                    <Button Click="BtnDeleteEmail_Click" Tag="{Binding Id}" Padding="10,5" 
+                                                            Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}" 
+                                                            BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" Cursor="Hand">
                                                         <Button.Resources>
                                                             <Style TargetType="Border">
                                                                 <Setter Property="CornerRadius" Value="4"/>
                                                             </Style>
                                                         </Button.Resources>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="🗑️ " FontSize="11" VerticalAlignment="Center"/>
+                                                            <TextBlock Text="Sil" FontSize="11" VerticalAlignment="Center"/>
+                                                        </StackPanel>
                                                     </Button>
                                                 </DataTemplate>
                                             </GridViewColumn.CellTemplate>
                                         </GridViewColumn>
+
                                     </GridView>
                                 </ListView.View>
                             </ListView>
                         </Grid>
                     </Border>
 
+                    <!-- ŞİFRE DEĞİŞTİRME -->
                     <Border Background="{DynamicResource InputBackground}" CornerRadius="12" Padding="20">
                         <StackPanel>
                             <TextBlock Text="🔑 Şifreyi Değiştir" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppText}" Margin="0,0,0,15"/>
 
                             <TextBlock Text="Mevcut Şifre:" Foreground="{DynamicResource AppText}" Margin="0,0,0,5"/>
-                            <PasswordBox x:Name="TxtCurrentPassword" Padding="8" Margin="0,0,0,10" Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}"/>
+                            <Border Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="6" Height="35" Margin="0,0,0,10">
+                                <PasswordBox x:Name="TxtCurrentPassword" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" Padding="10,0" VerticalContentAlignment="Center"/>
+                            </Border>
 
                             <TextBlock Text="Yeni Şifre:" Foreground="{DynamicResource AppText}" Margin="0,0,0,5"/>
-                            <PasswordBox x:Name="TxtNewPassword" Padding="8" Margin="0,0,0,10" Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}"/>
+                            <Border Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="6" Height="35" Margin="0,0,0,10">
+                                <PasswordBox x:Name="TxtNewPassword" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" Padding="10,0" VerticalContentAlignment="Center"/>
+                            </Border>
 
                             <TextBlock Text="Yeni Şifre (Tekrar):" Foreground="{DynamicResource AppText}" Margin="0,0,0,5"/>
-                            <PasswordBox x:Name="TxtConfirmPassword" Padding="8" Margin="0,0,0,15" Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}"/>
+                            <Border Background="{DynamicResource AppBackground}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" CornerRadius="6" Height="35" Margin="0,0,0,15">
+                                <PasswordBox x:Name="TxtConfirmPassword" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" Padding="10,0" VerticalContentAlignment="Center"/>
+                            </Border>
 
-                            <Button x:Name="BtnChangePassword" Content="🔑 Şifreyi Güncelle" Click="BtnChangePassword_Click" Height="40" Background="#FF4E6DE8" Foreground="White" BorderThickness="0">
-                                <Button.Resources>
-                                    <Style TargetType="Border">
-                                        <Setter Property="CornerRadius" Value="8"/>
-                                    </Style>
-                                </Button.Resources>
-                            </Button>
+                            <Button x:Name="BtnChangePassword" Content="🔑 Şifreyi Güncelle" Click="BtnChangePassword_Click" Height="40" Background="#4E6DE8" Style="{StaticResource FlatRoundedButton}"/>
                         </StackPanel>
                     </Border>
 

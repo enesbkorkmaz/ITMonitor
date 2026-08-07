@@ -1,14 +1,13 @@
 ﻿using ITMonitor.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Win32;
+using QuestPDF.Fluent;
+using QuestPDF.Infrastructure;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
-using Microsoft.Win32;
-using System.IO;
-using QuestPDF.Infrastructure;
-using QuestPDF.Fluent;
-using QuestPDF.Helpers;
 
 namespace ITMonitor.View
 {
@@ -17,25 +16,39 @@ namespace ITMonitor.View
         public ReportsView()
         {
             InitializeComponent();
-            LoadReportPreviewAsync();
+            // Açılışta boş arama kelimesiyle listeyi yükle
+            _ = LoadReportPreviewAsync("");
         }
 
+        // YENİ EKLENEN: Arama Kutusu Tetikleyicisi
+        private async void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            await LoadReportPreviewAsync(TxtSearch.Text);
+        }
 
-        private async void LoadReportPreviewAsync()
+        // GÜNCELLENEN: Arama kelimesini kabul eden ana yükleme metodu
+        private async Task LoadReportPreviewAsync(string keyword = "")
         {
             using (var context = new AppDbContext())
             {
-                var offlineDevices = await context.Devices
-                                                  .Where(d => d.IsActive == false)
-                                                  .Select(d => new
-                                                  {
-                                                      StatusIcon = "🔴",
-                                                      Name = d.Name,
-                                                      IpOrUrl = d.IpOrUrl,
-                                                      // BURASI DÜZELTİLDİ: LastErrorMessage yerine LastErrorCode kullanıyoruz
-                                                      LastErrorMessage = string.IsNullOrEmpty(d.LastErrorCode) ? "Bağlantı Yok" : d.LastErrorCode
-                                                  })
-                                                  .ToListAsync();
+                // Sadece pasif/hatalı cihazları sorgula
+                var query = context.Devices.Where(d => d.IsActive == false).AsQueryable();
+
+                // Eğer arama kutusu boş değilse, cihaz isminde veya IP adresinde kelimeyi ara
+                if (!string.IsNullOrWhiteSpace(keyword))
+                {
+                    string lowerKeyword = keyword.ToLower();
+                    query = query.Where(d => d.Name.ToLower().Contains(lowerKeyword) ||
+                                             d.IpOrUrl.ToLower().Contains(lowerKeyword));
+                }
+
+                var offlineDevices = await query.Select(d => new
+                {
+                    StatusIcon = "🔴",
+                    Name = d.Name,
+                    IpOrUrl = d.IpOrUrl,
+                    LastErrorMessage = string.IsNullOrEmpty(d.LastErrorCode) ? "Bağlantı Yok" : d.LastErrorCode
+                }).ToListAsync();
 
                 ReportPreviewList.ItemsSource = offlineDevices;
             }
@@ -191,7 +204,7 @@ namespace ITMonitor.View
 
                 if (result.isSuccess)
                 {
-                    // Standart MessageBox yerine projenin özel CustomMessageBox'ını kullanıyoruz
+
                     CustomMessageBox.Show(result.message, "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else

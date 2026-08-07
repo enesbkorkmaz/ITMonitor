@@ -64,11 +64,18 @@ namespace ITMonitor.View
                     // Kullanıcı bulunduysa VE şifresi eşleşiyorsa
                     if (user != null && user.Password == password)
                     {
-                        // Giriş Başarılı -> Ana Pencereyi Aç
+                        // 1. Kullanıcıyı veritabanında "Oturum Açtı" olarak işaretle ve kaydet
+                        user.IsLoggedIn = true;
+                        await context.SaveChangesAsync();
+
+                        // 2. Kullanıcı adını sistemin hafızasına (AppState) al
+                        AppState.CurrentUser = user.Username;
+
+                        // 3. Giriş Başarılı -> Ana Pencereyi Aç
                         MainWindow main = new MainWindow();
                         main.Show();
 
-                        // Login Ekranını Kapat
+                        // 4. Login Ekranını Kapat
                         this.Close();
                     }
                     else
@@ -92,7 +99,10 @@ namespace ITMonitor.View
                 BtnText.Visibility = Visibility.Visible;
                 LoadingSpinner.Visibility = Visibility.Collapsed;
             }
+        
         }
+
+    
 
         // --- MİNİMİZE BUTONU ---
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)

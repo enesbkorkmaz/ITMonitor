@@ -210,7 +210,7 @@ namespace ITMonitor.View
 
                 if (devices.Count == 0)
                 {
-                    MessageBox.Show("Dışa aktarılacak cihaz bulunamadı!", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    CustomMessageBox.Show("Dışa aktarılacak cihaz bulunamadı!", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -232,12 +232,12 @@ namespace ITMonitor.View
                     // Metni dosyaya yazdır
                     File.WriteAllText(saveFileDialog.FileName, jsonString);
 
-                    MessageBox.Show("Veriler başarıyla dışa aktarıldı!", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
+                    CustomMessageBox.Show("Veriler başarıyla dışa aktarıldı!", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Dışa aktarılırken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+                CustomMessageBox.Show($"Dışa aktarılırken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         private void BtnImport_Click(object sender, RoutedEventArgs e)
@@ -279,17 +279,17 @@ namespace ITMonitor.View
                         // Arayüzdeki listeyi yenile (Kendi projendeki verileri yükleme metodunun adını buraya yaz, örn: LoadData() veya LoadDevices())
                         // LoadDevices(); 
 
-                        MessageBox.Show($"{importedDevices.Count} cihaz başarıyla içe aktarıldı!", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
+                        CustomMessageBox.Show($"{importedDevices.Count} cihaz başarıyla içe aktarıldı!", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     else
                     {
-                        MessageBox.Show("Dosya boş veya uygun formatta değil.", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        CustomMessageBox.Show("Dosya boş veya uygun formatta değil.", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"İçe aktarılırken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+                CustomMessageBox.Show($"İçe aktarılırken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         private async void BtnAutoDiscover_Click(object sender, RoutedEventArgs e)
@@ -299,7 +299,7 @@ namespace ITMonitor.View
 
             if (string.IsNullOrEmpty(ipAddress))
             {
-                MessageBox.Show("Lütfen tarama yapmak için önce bir IP adresi veya URL girin.", "Eksik Bilgi", MessageBoxButton.OK, MessageBoxImage.Warning);
+                CustomMessageBox.Show("Lütfen tarama yapmak için önce bir IP adresi veya URL girin.", "Eksik Bilgi", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -348,7 +348,7 @@ namespace ITMonitor.View
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Tarama sırasında beklenmeyen bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+                CustomMessageBox.Show($"Tarama sırasında beklenmeyen bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {

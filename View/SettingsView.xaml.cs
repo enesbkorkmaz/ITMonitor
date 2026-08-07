@@ -127,12 +127,12 @@ namespace ITMonitor.View
 
                     await context.SaveChangesAsync();
 
-                    MessageBox.Show("Tüm ayarlar başarıyla kaydedildi!", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
+                    CustomMessageBox.Show("Tüm ayarlar başarıyla kaydedildi!", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (System.Exception ex)
             {
-                MessageBox.Show($"Ayarlar kaydedilirken bir veritabanı hatası oluştu!\n\nHata: {ex.InnerException?.Message ?? ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+                CustomMessageBox.Show($"Ayarlar kaydedilirken bir veritabanı hatası oluştu!\n\nHata: {ex.InnerException?.Message ?? ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -151,7 +151,7 @@ namespace ITMonitor.View
 
             if (string.IsNullOrWhiteSpace(smtpServer) || string.IsNullOrWhiteSpace(senderEmail) || string.IsNullOrWhiteSpace(senderPassword))
             {
-                MessageBox.Show("Lütfen önce SMTP Sunucusu, Gönderici E-Posta ve Şifre alanlarını doldurun.", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
+                CustomMessageBox.Show("Lütfen önce SMTP Sunucusu, Gönderici E-Posta ve Şifre alanlarını doldurun.", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -175,11 +175,11 @@ namespace ITMonitor.View
                     }
                 }
 
-                MessageBox.Show($"Test e-postası başarıyla '{senderEmail}' adresine gönderildi!", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
+                CustomMessageBox.Show($"Test e-postası başarıyla '{senderEmail}' adresine gönderildi!", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (System.Exception ex)
             {
-                MessageBox.Show($"Test e-postası gönderilirken hata oluştu:\n{ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+                CustomMessageBox.Show($"Test e-postası gönderilirken hata oluştu:\n{ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -193,7 +193,7 @@ namespace ITMonitor.View
         {
             if (string.IsNullOrWhiteSpace(TxtNewEmailAddress.Text) || TxtNewEmailAddress.Text == "eposta@adres.com")
             {
-                MessageBox.Show("Lütfen geçerli bir e-posta adresi girin.", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
+                CustomMessageBox.Show("Lütfen geçerli bir e-posta adresi girin.", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -239,13 +239,13 @@ namespace ITMonitor.View
 
             if (string.IsNullOrWhiteSpace(currentPass) || string.IsNullOrWhiteSpace(newPass))
             {
-                MessageBox.Show("Lütfen tüm şifre alanlarını doldurun.", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
+                CustomMessageBox.Show("Lütfen tüm şifre alanlarını doldurun.", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             if (newPass != confirmPass)
             {
-                MessageBox.Show("Yeni şifreler birbiriyle eşleşmiyor!", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+                CustomMessageBox.Show("Yeni şifreler birbiriyle eşleşmiyor!", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -256,7 +256,7 @@ namespace ITMonitor.View
                 {
                     if (user.Password != currentPass)
                     {
-                        MessageBox.Show("Mevcut şifreniz hatalı!", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+                        CustomMessageBox.Show("Mevcut şifreniz hatalı!", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
 
@@ -267,11 +267,11 @@ namespace ITMonitor.View
                     TxtNewPassword.Clear();
                     TxtConfirmPassword.Clear();
 
-                    MessageBox.Show("Giriş şifreniz başarıyla değiştirildi!", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
+                    CustomMessageBox.Show("Giriş şifreniz başarıyla değiştirildi!", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
-                    MessageBox.Show("Kullanıcı kaydı bulunamadı.", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+                    CustomMessageBox.Show("Kullanıcı kaydı bulunamadı.", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

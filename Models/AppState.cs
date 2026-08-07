@@ -6,5 +6,6 @@ namespace ITMonitor
     {
       
         public static string LastScanTime { get; set; } = "-";
+        public static string CurrentUser { get; set; } = "Admin";
     }
 }

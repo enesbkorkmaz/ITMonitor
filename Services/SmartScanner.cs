@@ -11,7 +11,8 @@ namespace ITMonitor.Services
              public async Task<string> DetectDeviceCategoryAsync(string ipAddress)
         {
             // 1. Veritabanı Kontrolü (SQL Server, PostgreSQL, MySQL)
-            if (await IsPortOpenAsync(ipAddress, 1433) ||
+            if (await IsPortOpenAsync(ipAddress, 1421) ||
+                await IsPortOpenAsync(ipAddress, 1433) ||
                 await IsPortOpenAsync(ipAddress, 5432) ||
                 await IsPortOpenAsync(ipAddress, 3306))
             {

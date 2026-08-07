@@ -193,7 +193,19 @@
 
                     <Border Grid.Column="3" Background="{DynamicResource AppBackground}" CornerRadius="6" Padding="10,5" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1">
                         <Grid>
-                            <TextBlock Text="🔍 Ara..." Foreground="{DynamicResource AppText}" Opacity="0.4" VerticalAlignment="Center" Margin="5,0"/>
+                            <TextBlock Text="🔍 Ara..." Foreground="{DynamicResource AppText}" Opacity="0.4" VerticalAlignment="Center" Margin="5,0" IsHitTestVisible="False">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Hidden"/>
+                                        <Style.Triggers>
+                                            <!-- Kutu boşsa yazıyı göster -->
+                                            <DataTrigger Binding="{Binding Text, ElementName=TxtSearch}" Value="">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                             <TextBox x:Name="TxtSearch" TextChanged="TxtSearch_TextChanged" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" VerticalContentAlignment="Center"/>
                         </Grid>
                     </Border>
@@ -211,6 +223,30 @@
 
                     <ListView.View>
                         <GridView>
+                            <GridViewColumn Header="Durum" Width="70">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Ellipse Width="14" Height="14" HorizontalAlignment="Left" Margin="10,0,0,0">
+                                            <Ellipse.Style>
+                                                <Style TargetType="Ellipse">
+                                                    <!-- Varsayılan Renk: Kırmızı (Pasif / Hatalı) -->
+                                                    <Setter Property="Fill" Value="#E74C3C"/>
+                                                    <Style.Triggers>
+                                                        <!-- Aktifse: Yeşil Yap -->
+                                                        <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                            <Setter Property="Fill" Value="#2ECC71"/>
+                                                        </DataTrigger>
+                                                        <!-- Henüz hiç taranmadıysa (LastScanTime Null ise): Sarı Yap -->
+                                                        <DataTrigger Binding="{Binding LastScanTime}" Value="{x:Null}">
+                                                            <Setter Property="Fill" Value="#F1C40F"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Ellipse.Style>
+                                        </Ellipse>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
                             <GridViewColumn Header="Cihaz Adı" Width="130" DisplayMemberBinding="{Binding Name}"/>
                             <GridViewColumn Header="IP / URL" Width="120" DisplayMemberBinding="{Binding IpOrUrl}"/>
                             <GridViewColumn Header="Kategori" Width="100" DisplayMemberBinding="{Binding Category}"/>

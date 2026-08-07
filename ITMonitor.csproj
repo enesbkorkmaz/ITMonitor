@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <None Remove="Images\icon.ico" />
+    <None Remove="View\icon.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,6 +32,7 @@
     <Resource Include="Images\icon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="View\icon.ico" />
   </ItemGroup>
 
 </Project>

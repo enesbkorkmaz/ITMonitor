@@ -22,12 +22,28 @@
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                 <ProgressBar x:Name="ScanProgressBar" Width="100" Height="6" Margin="0,0,15,0" IsIndeterminate="True" Visibility="Hidden" Foreground="#007AFF" BorderThickness="0" Background="Transparent"/>
-                <Button x:Name="BtnStartScan" Click="BtnStartScan_Click" Content="🚀 Taramayı Başlat" Height="35" Padding="15,0" Background="#007AFF" Foreground="White" FontWeight="SemiBold" FontSize="13" BorderThickness="0" Cursor="Hand">
-                    <Button.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="6"/>
+
+                <!-- DÜZELTİLDİ: WPF'in varsayılan pasifleşme(beyazlama) huyunu ControlTemplate ile ezdik -->
+                <Button x:Name="BtnStartScan" Click="BtnStartScan_Click" Content="🚀 Taramayı Başlat" Height="41" Padding="15,0" Foreground="White" FontWeight="SemiBold" FontSize="13" BorderThickness="0" Cursor="Hand" Width="125">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Background" Value="#007AFF"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="btnBorder" Background="{TemplateBinding Background}" CornerRadius="6">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <Setter TargetName="btnBorder" Property="Background" Value="#80007AFF"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
                         </Style>
-                    </Button.Resources>
+                    </Button.Style>
                 </Button>
             </StackPanel>
         </Grid>
@@ -57,7 +73,7 @@
             <Border Grid.Column="2" Background="{DynamicResource InputBackground}" CornerRadius="12" Margin="5,0,10,15" Padding="20,15">
                 <StackPanel VerticalAlignment="Center">
                     <TextBlock Text="Hatalı Bağlantı" Foreground="{DynamicResource AppText}" Opacity="0.7" FontSize="13" FontWeight="Medium"/>
-                    <TextBlock x:Name="TxtOfflineDevice" Text="0" Foreground="#E74C3C" FontSize="36" FontWeight="Bold" Margin="0,2,0,0"/>
+                    <TextBlock x:Name="TxtOfflineDevice" Text="0" Foreground="#FF4757" FontSize="36" FontWeight="Bold" Margin="0,2,0,0"/>
                 </StackPanel>
             </Border>
 
@@ -111,13 +127,14 @@
                         <RowDefinition Height="250"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Text="⚠️ Kritik / Sorunlu Cihazlar" Foreground="#E74C3C" FontSize="15" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <TextBlock Grid.Row="0" Text="⚠️ Kritik / Sorunlu Cihazlar" Foreground="#FF4757" FontSize="15" FontWeight="Bold" Margin="0,0,0,10"/>
 
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,0,0,10">
                         <ItemsControl x:Name="CriticalDevicesControl">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="#2A1A1A" BorderBrush="#E74C3C" BorderThickness="1" CornerRadius="8" Padding="10" Margin="0,0,0,8">
+                                    <!-- DÜZELTİLDİ: Background Dinamik yapıldı, Kırmızı tonu her iki modda okunabilen #FF4757 yapıldı -->
+                                    <Border Background="{DynamicResource AppBackground}" BorderBrush="#FF4757" BorderThickness="1" CornerRadius="8" Padding="10" Margin="0,0,0,8">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto"/>
@@ -131,7 +148,7 @@
                                                 <TextBlock Text="{Binding Name}" Foreground="{DynamicResource AppText}" FontSize="13" FontWeight="Bold"/>
                                                 <TextBlock Text="{Binding IpOrUrl}" Foreground="{DynamicResource AppText}" Opacity="0.6" FontSize="11"/>
 
-                                                <TextBlock Foreground="#E74C3C" FontSize="11" FontWeight="SemiBold" Margin="0,2,0,0" TextWrapping="Wrap">
+                                                <TextBlock Foreground="#FF4757" FontSize="11" FontWeight="SemiBold" Margin="0,2,0,0" TextWrapping="Wrap">
                                                     <Run Text="Hata: "/>
                                                     <Run Text="{Binding LastErrorCode}"/>
                                                 </TextBlock>

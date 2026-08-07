@@ -95,6 +95,30 @@ namespace ITMonitor.View
             }
         }
 
+        private async void BtnLogout_Click(object sender, RoutedEventArgs e)
+        {
+            // 1. Veritabanındaki oturumu kapat
+            using (var context = new ITMonitor.Data.AppDbContext())
+            {
+                var user = context.Users.FirstOrDefault(u => u.Username == AppState.CurrentUser);
+                if (user != null)
+                {
+                    user.IsLoggedIn = false;
+                    await context.SaveChangesAsync(); // Değişikliği veritabanına yaz
+                }
+            }
+
+            // 2. Hafızayı temizle
+            AppState.CurrentUser = "";
+
+            // 3. Login ekranını yeniden başlat
+            View.LoginView login = new View.LoginView();
+            login.Show();
+
+            // 4. Ana ekranı kapat
+            this.Close();
+        }
+
         private void RadioButton_Checked(object sender, RoutedEventArgs e)
         {
 

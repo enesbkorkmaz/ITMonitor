@@ -1,8 +1,9 @@
 ﻿using System.Windows;
 using ITMonitor.Data;
 using ITMonitor.Services;
+using ITMonitor.View;
 using System.Linq;
-using System; // Exception için eklendi
+using System;
 
 namespace ITMonitor
 {
@@ -10,7 +11,7 @@ namespace ITMonitor
     {
         protected override void OnStartup(StartupEventArgs e)
         {
-            // DİKKAT: base.OnStartup(e) KODUNU BURADAN ALIP EN ALTA TAŞIDIK!
+            base.OnStartup(e);
 
             try
             {
@@ -35,14 +36,34 @@ namespace ITMonitor
 
                 // 3. Otomasyon motorunu başlat
                 ReportSchedulerService.Instance.Start();
+
+                // 4. Auto-login kontrolü: IsLoggedIn = true olan bir kullanıcı var mı?
+                Window startupWindow;
+
+                using (var context = new AppDbContext())
+                {
+                    var loggedInUser = context.Users.FirstOrDefault(u => u.IsLoggedIn);
+
+                    if (loggedInUser != null)
+                    {
+                        // Kim giriş yapmışsa, AppState'e onu yükle
+                        AppState.CurrentUser = loggedInUser.Username;
+                        startupWindow = new MainWindow();
+                    }
+                    else
+                    {
+                        startupWindow = new LoginView();
+                    }
+                }
+
+                this.MainWindow = startupWindow;
+                startupWindow.Show();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Başlangıç ayarları yapılırken bir hata oluştu:\n{ex.Message}", "Sistem Hatası", MessageBoxButton.OK, MessageBoxImage.Error);
+                Shutdown();
             }
-
-            // 4. TEMİZLİK BİTTİ -> ŞİMDİ EKRANI GÖSTER
-            base.OnStartup(e);
         }
 
         private void ResetAllDeviceStatuses()
@@ -67,13 +88,11 @@ namespace ITMonitor
                         db.DeviceLogs.RemoveRange(allLogs);
                     }
 
-                    // Değişiklikleri kaydet
                     db.SaveChanges();
                 }
             }
             catch (Exception ex)
             {
-                // Asıl hatayı (InnerException) yakalayıp ekrana yazdırıyoruz
                 string gercekHata = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
                 MessageBox.Show($"Hata Detayı:\n{gercekHata}", "Veritabanı Kilitli", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
