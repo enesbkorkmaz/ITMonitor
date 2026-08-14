@@ -1,5 +1,7 @@
 ﻿using ITMonitor.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.IO;
 
 namespace ITMonitor.Data
 {
@@ -9,8 +11,6 @@ namespace ITMonitor.Data
         public DbSet<DeviceLog> DeviceLogs { get; set; }
         public DbSet<SystemSetting> SystemSettings { get; set; }
         public DbSet<Email> Emails { get; set; }
-
-        // YENİ EKLENEN SATIR: Kullanıcılar Tablosu
         public DbSet<User> Users { get; set; }
 
         public AppDbContext()
@@ -20,7 +20,15 @@ namespace ITMonitor.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=ITMonitor.db");
+            string appDataPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "ITMonitor");
+
+            Directory.CreateDirectory(appDataPath);
+
+            string dbPath = Path.Combine(appDataPath, "ITMonitor.db");
+
+            optionsBuilder.UseSqlite($"Data Source={dbPath}");
         }
     }
 }

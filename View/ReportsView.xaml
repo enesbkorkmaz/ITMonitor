@@ -4,13 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="800"
+             d:DesignHeight="600" d:DesignWidth="850"
              Background="Transparent">
 
-    <!-- MODERN TABLO VE BUTON TASARIM ŞABLONLARI -->
     <UserControl.Resources>
-
-        <!-- YENİ EKLENEN: İşlem Sırasında Okunabilir Kalan Modern Buton Şablonu -->
+        <!-- Modern Buton Şablonu -->
         <Style TargetType="Button" x:Key="FlatRoundedButton">
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -25,7 +23,6 @@
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="btnBorder" Property="Opacity" Value="0.85"/>
                             </Trigger>
-                            <!-- DÜZELTİLEN KISIM: Buton pasifken grileşmek yerine sadece %50 saydam olur, yazılar bembeyaz/okunur kalır -->
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="btnBorder" Property="Opacity" Value="0.5"/>
                             </Trigger>
@@ -68,11 +65,15 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="20">
+    <!-- GÜNCELLENEN KISIM: Dış ScrollViewer kaldırıldı. Ana Grid, taşma koruması olan margin (40) ile pencereye tam oturtuldu. -->
+    <Grid Margin="20,20,20,40">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <!-- Başlık Satırı -->
             <RowDefinition Height="*"/>
+            <!-- Liste Satırı (Kendi içinde kaydırılabilir alan) -->
             <RowDefinition Height="Auto"/>
+            <!-- Sabit Buton Satırı -->
         </Grid.RowDefinitions>
 
         <!-- BAŞLIK VE ARAMA KUTUSU -->
@@ -89,7 +90,6 @@
                            Foreground="{DynamicResource AppText}" Opacity="0.7" FontSize="14" Margin="0,5,0,0"/>
             </StackPanel>
 
-            <!-- Arama Kutusu -->
             <Border Grid.Column="2" Background="{DynamicResource AppBackground}" CornerRadius="6" Padding="10,5" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" VerticalAlignment="Center">
                 <Grid>
                     <TextBlock Text="🔍 Raporda Ara..." Foreground="{DynamicResource AppText}" Opacity="0.4" VerticalAlignment="Center" Margin="5,0" IsHitTestVisible="False">
@@ -110,6 +110,7 @@
         </Grid>
 
         <!-- RAPOR ÖNİZLEME LİSTESİ -->
+        <!-- Grid.Row="1" ve Height="*" sayesinde bu alan kalan boşluğu kaplar ve liste uzadıkça kendi ScrollViewer'ını çalıştırır -->
         <Border Grid.Row="1" Background="{DynamicResource InputBackground}" CornerRadius="12" Padding="15">
             <Grid>
                 <Grid.RowDefinitions>
@@ -119,7 +120,7 @@
 
                 <TextBlock Grid.Row="0" Text="Rapor Önizlemesi (Hatalı / Pasif Cihazlar)" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource AppText}" Margin="0,0,0,15"/>
 
-                <ListView x:Name="ReportPreviewList" Grid.Row="1" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource AppText}" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                <ListView x:Name="ReportPreviewList" Grid.Row="1" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource AppText}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="Durum" Width="80" DisplayMemberBinding="{Binding StatusIcon}"/>
@@ -133,25 +134,31 @@
         </Border>
 
         <!-- AKSİYON BUTONLARI -->
+        <!-- Bu kısım daima en altta sabit kalacaktır -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
 
             <Button x:Name="BtnExportTxt" Content="📝 TXT Kaydet" Click="BtnExportTxt_Click" 
-                    Width="130" Height="40" Margin="0,0,10,0"
-                    Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1"
-                    Style="{StaticResource FlatRoundedButton}" />
-
-            <Button x:Name="BtnExportPdf" Content="📄 PDF Kaydet" Click="BtnExportPdf_Click" 
-                    Width="130" Height="40" Margin="0,0,10,0"
-                    Background="#E74C3C" Foreground="White"
-                    Style="{StaticResource FlatRoundedButton}" />
-
-            <Button x:Name="BtnPrint" Content="🖨️ Yazdır" Click="BtnPrint_Click" 
                     Width="110" Height="40" Margin="0,0,10,0"
                     Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1"
                     Style="{StaticResource FlatRoundedButton}" />
 
+            <Button x:Name="BtnExportPdf" Content="📄 Hatalıları Kaydet" Click="BtnExportPdf_Click" 
+                    Width="140" Height="40" Margin="0,0,10,0"
+                    Background="#E74C3C" Foreground="White"
+                    Style="{StaticResource FlatRoundedButton}" />
+
+            <Button x:Name="BtnExportDetailedPdf" Content="📊 Tümünü Raporla (Detaylı)" Click="BtnExportDetailedPdf_Click" 
+                    Width="190" Height="40" Margin="0,0,10,0"
+                    Background="#8E44AD" Foreground="White"
+                    Style="{StaticResource FlatRoundedButton}" />
+
+            <Button x:Name="BtnPrint" Content="🖨️ Yazdır" Click="BtnPrint_Click" 
+                    Width="90" Height="40" Margin="0,0,10,0"
+                    Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1"
+                    Style="{StaticResource FlatRoundedButton}" />
+
             <Button x:Name="BtnSendEmail" Content="📧 E-Posta Gönder" Click="BtnSendEmail_Click" 
-                    Width="150" Height="40"
+                    Width="130" Height="40"
                     Background="#3498DB" Foreground="White"
                     Style="{StaticResource FlatRoundedButton}" />
 
