@@ -240,46 +240,57 @@ namespace ITMonitor.View
                 CustomMessageBox.Show($"Dışa aktarılırken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-        private void BtnImport_Click(object sender, RoutedEventArgs e)
+        private async void BtnImport_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-
                 OpenFileDialog openFileDialog = new OpenFileDialog
                 {
-                    Filter = "ITMonitor Yedek Dosyası (*.itm)|*.itm", // Sadece .itm dosyalarını göster
+                    Filter = "ITMonitor Yedek Dosyası (*.itm)|*.itm",
                     Title = "Envanteri İçe Aktar"
                 };
 
-                // 2. Kullanıcı dosyayı seçip Tamam'a basarsa:
                 if (openFileDialog.ShowDialog() == true)
                 {
-                    // Dosyadaki metni oku
                     string jsonString = File.ReadAllText(openFileDialog.FileName);
-
-                    // Metni tekrar Cihaz (Device) listesine dönüştür
                     var importedDevices = JsonSerializer.Deserialize<List<Device>>(jsonString);
 
                     if (importedDevices != null && importedDevices.Count > 0)
                     {
                         using var db = new AppDbContext();
 
+                        // 1. Veritabanında kayıtlı olan mevcut IP/URL adreslerini (küçük harfe çevirerek) bir listeye alıyoruz
+                        var existingIps = db.Devices.Select(d => d.IpOrUrl.ToLower()).ToList();
+                        int addedCount = 0; // Sadece yeni eklenenleri saymak için
+
                         foreach (var device in importedDevices)
                         {
-                            // ÇOK ÖNEMLİ: Eski ID'leri sıfırlıyoruz. 
-                            // Veritabanı çakışmayı önlemek için otomatik yeni ID atayacaktır.
-                            device.Id = 0;
+                            // 2. Eğer bu IP zaten veritabanında varsa bu adımı atla (continue)
+                            if (existingIps.Contains(device.IpOrUrl.ToLower()))
+                            {
+                                continue;
+                            }
 
+                            // 3. Eğer IP veritabanında yoksa, sıfır kilometre bir ID atayıp listeye ekle
+                            device.Id = 0;
                             db.Devices.Add(device);
+                            addedCount++;
                         }
 
-                        // Veritabanına kaydet
-                        db.SaveChanges();
+                        // Sadece yeni eklenenler varsa veritabanını güncelle
+                        if (addedCount > 0)
+                        {
+                            db.SaveChanges();
 
-                        // Arayüzdeki listeyi yenile (Kendi projendeki verileri yükleme metodunun adını buraya yaz, örn: LoadData() veya LoadDevices())
-                        // LoadDevices(); 
+                            // Arayüzdeki listeyi yenile
+                            await LoadDevicesAsync(TxtSearch.Text);
 
-                        CustomMessageBox.Show($"{importedDevices.Count} cihaz başarıyla içe aktarıldı!", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
+                            CustomMessageBox.Show($"{addedCount} yeni cihaz başarıyla içe aktarıldı!\n(Zaten var olan cihazlar atlandı.)", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                        else
+                        {
+                            CustomMessageBox.Show("İçe aktarılan dosyadaki tüm cihazlar zaten envanterde mevcut. Yeni cihaz eklenmedi.", "Bilgi", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
                     }
                     else
                     {
