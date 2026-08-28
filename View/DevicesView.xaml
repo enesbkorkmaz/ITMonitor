@@ -94,6 +94,9 @@
                                                                 <DataTrigger Binding="{Binding Category}" Value="Ağ Cihazı (Switch/Router)">
                                                                     <Setter Property="Text" Value="📡"/>
                                                                 </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Category}" Value="Ağ Anahtarı">
+                                                                    <Setter Property="Text" Value="🖧"/>
+                                                                </DataTrigger>
                                                                 <DataTrigger Binding="{Binding Category}" Value="Güvenlik Duvarı (Firewall)">
                                                                     <Setter Property="Text" Value="🛡️"/>
                                                                 </DataTrigger>

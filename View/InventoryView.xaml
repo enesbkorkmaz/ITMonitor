@@ -340,6 +340,7 @@
                     <ComboBoxItem Content="Web Servisi"/>
                     <ComboBoxItem Content="Ofis Cihazı"/>
                     <ComboBoxItem Content="Ağ Cihazı (Switch/Router)"/>
+                    <ComboBoxItem Content="Ağ Anahtarı"/>
                     <ComboBoxItem Content="Güvenlik Duvarı (Firewall)"/>
                     <ComboBoxItem Content="Yazıcı"/>
                     <ComboBoxItem Content="Veritabanı Sunucusu"/>
