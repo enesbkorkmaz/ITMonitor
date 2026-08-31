@@ -1,18 +1,14 @@
-# ITMonitor Durum Raporu 
-
-**Tarih:** 17 Ağustos 2026
-
 **Hazırlayan:** Enes Burak Korkmaz 
 
 **Ana Konu:** BT Sistemlerinin günlük izleme yazılımı 
 
 ## 1. Giriş ve Amaç
-Bu proje, kurum içi ağ sistemlerinin, sunucuların, web servislerinin ve ofis cihazlarının (yazıcılar vb.) sağlığını anlık olarak izlemek, olası kesintileri tespit etmek ve yöneticilere otomatik bildirimler sunmak amacıyla sıfırdan geliştirilen 'ITMonitor' projesidir [cite: 1]. Başlangıçta basit bir 'ping atma' aracı olarak kurgulanan proje, kurumsal ihtiyaçlar doğrultusunda kendi veritabanını yöneten, dinamik PDF raporları çizebilen, TCP port ve SNMP taramaları yapabilen, uçtan uca (Full-Stack) profesyonel bir Masaüstü BT Otomasyon ve İzleme Yazılımına dönüştürülmüştür.
+Bu proje, kurum içi ağ sistemlerinin, sunucuların, web servislerinin ve ofis cihazlarının (yazıcılar vb.) sağlığını anlık olarak izlemek, olası kesintileri tespit etmek ve yöneticilere otomatik bildirimler sunmak amacıyla sıfırdan geliştirilen 'ITMonitor' projesidir. Başlangıçta basit bir 'ping atma' aracı olarak kurgulanan proje, kurumsal ihtiyaçlar doğrultusunda kendi veritabanını yöneten, dinamik PDF raporları çizebilen, TCP port ve SNMP taramaları yapabilen, uçtan uca (Full-Stack) profesyonel bir Masaüstü BT Otomasyon ve İzleme Yazılımına dönüştürülmüştür.
 ## 2. Kullanılan Teknolojiler ve Sistem Altyapısı
 Uygulama Frontend (Ön Yüz), Backend (İş Mantığı ve İzleme Motoru) ve Database (Veritabanı Katmanı) olmak üzere üç ana katmandan (N-Tier Architecture) oluşmaktadır.
 
 ### 2.1. Geliştirme Ortamı ve Frontend
-* **Platform:** .NET 8.0 [cite: 1]
+* **Platform:** .NET 8.0
 * **Arayüz Tasarımı:** WPF (Windows Presentation Foundation) / XAML 
 * **Tasarım Deseni:** MVVM (Model-View-ViewModel)
 * **Görselleştirme:** LiveCharts.Wpf kütüphanesi (Halka ve çizgi grafikler)
