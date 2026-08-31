@@ -57,9 +57,14 @@ The asynchronously (async/await) operating monitoring engine (MonitoringService)
 * SMTP mail server information can be configured and tested.
 * With the Automatic Scan Scheduler, the network can be scanned at specified intervals (e.g., every 15 minutes), and the most up-to-date status can be automatically emailed to administrators as a PDF report.
 
-## 5. Conclusion and Future Vision
+### 5. Conclusion and Future Vision
 ITMonitor has become a high-performance and modern 'Full-Stack' desktop software that can be used in corporate IT departments, not just meeting internship goals. 
 Future versions aim to add live monitoring of CPU/RAM consumption with WMI (Windows Management Instrumentation) integration, generate topology maps, and include Slack/Discord Webhook notifications.
+
+### Screenshots
+
+  <img src="https://raw.githubusercontent.com/enesbkorkmaz/ITMonitor/refs/heads/master/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202026-08-31%20152740.png" />
+  <img src="https://raw.githubusercontent.com/enesbkorkmaz/ITMonitor/refs/heads/master/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202026-08-31%20152658.png" />
 
 ---
 
@@ -115,3 +120,4 @@ Asenkron (async/await) çalışan izleme motoru (MonitoringService), arayüzü d
 ## 5. Sonuç ve Gelecek Vizyonu
 ITMonitor, sadece staj hedeflerini karşılamakla kalmayıp kurumsal BT departmanlarında kullanılabilecek, performanslı ve modern bir 'Full-Stack' masaüstü yazılımı olmuştur. 
 Gelecek sürümlerde WMI (Windows Management Instrumentation) entegrasyonu ile CPU/RAM tüketimlerinin canlı izlenmesi, topoloji haritalarının çıkarılması ve Slack/Discord Webhook bildirimlerinin eklenmesi hedeflenmektedir.
+
