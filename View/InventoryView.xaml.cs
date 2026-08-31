@@ -3,12 +3,13 @@ using ITMonitor.Models;
 using ITMonitor.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
-using System.IO; 
+using System.IO;
 using System.Text.Json;
 
 namespace ITMonitor.View
@@ -25,7 +26,48 @@ namespace ITMonitor.View
 
         private async void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            await LoadCategoriesAsync(); // Dinamik kategorileri getir
             await LoadDevicesAsync();
+        }
+
+        // ================= KATEGORİLERİ DİNAMİK YÜKLEME =================
+        private async Task LoadCategoriesAsync()
+        {
+            // Cihazlar sayfasındaki özel ikonların (Emoji) çalışması için gereken sabit liste
+            var defaultCategories = new List<string>
+    {
+        "Ağ Cihazı (Switch/Router)",
+        "Diğer",
+        "Güvenlik Duvarı (Firewall)",
+        "Ofis Cihazı",
+        "Sunucu",
+        "Veritabanı Sunucusu",
+        "Web Servisi",
+        "Yazıcı"
+    };
+
+            using (var context = new AppDbContext())
+            {
+                // Veritabanından mevcut olan farklı kategorileri çek (boş olanları atla)
+                var dbCategories = await context.Devices
+                                                .Select(d => d.Category)
+                                                .Where(c => !string.IsNullOrWhiteSpace(c))
+                                                .Distinct()
+                                                .ToListAsync();
+
+                // 1. Sabit listemizle veritabanından gelen listeyi birleştiriyoruz (Union)
+                // 2. Ardından A'dan Z'ye alfabetik olarak sıralıyoruz (OrderBy)
+                var allCategories = defaultCategories
+                                    .Union(dbCategories)
+                                    .OrderBy(c => c)
+                                    .ToList();
+
+                // Listeyi ComboBox'a bağla
+                CmbCategory.ItemsSource = allCategories;
+
+                // Kutunun içi boş kalmasın diye ilk sıradakini varsayılan yapıyoruz
+                CmbCategory.SelectedIndex = 0;
+            }
         }
 
         // ================= 1. VERİLERİ OKUMA VE ARAMA =================
@@ -55,9 +97,12 @@ namespace ITMonitor.View
         {
             string name = TxtDeviceName.Text.Trim();
             string ipOrUrl = TxtIpOrUrl.Text.Trim();
-            string category = (CmbCategory.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Diğer";
-            string method = (CmbMethod.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Ping";
-            string description = TxtDescription.Text.Trim(); // YENİ EKLENEN SATIR
+
+            // Artık IsEditable=True olduğu için seçilen değil, "yazılan/seçilen" Text'i doğrudan okuyoruz
+            string category = string.IsNullOrWhiteSpace(CmbCategory.Text) ? "Diğer" : CmbCategory.Text.Trim();
+
+            string method = (CmbMethod.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Ping (ICMP)";
+            string description = TxtDescription.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(ipOrUrl))
             {
@@ -67,6 +112,27 @@ namespace ITMonitor.View
 
             using (var context = new AppDbContext())
             {
+                // --- YENİ EKLENEN: MÜKERRER IP KONTROLÜ ---
+                bool ipExists = false;
+
+                if (_selectedDeviceId == null)
+                {
+                    // YENİ EKLEME: Veritabanında bu IP'ye sahip herhangi bir kayıt var mı?
+                    ipExists = await context.Devices.AnyAsync(d => d.IpOrUrl.ToLower() == ipOrUrl.ToLower());
+                }
+                else
+                {
+                    // GÜNCELLEME: Düzenlenen bu cihaz "hariç" başka bir cihazda bu IP kullanılmış mı?
+                    ipExists = await context.Devices.AnyAsync(d => d.IpOrUrl.ToLower() == ipOrUrl.ToLower() && d.Id != _selectedDeviceId);
+                }
+
+                if (ipExists)
+                {
+                    CustomMessageBox.Show("Bu IP Adresi veya URL zaten envanterde kayıtlı! Lütfen farklı bir adres girin.", "Mükerrer Kayıt", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return; // IP varsa kaydetme işlemini anında durdur
+                }
+                // ------------------------------------------
+
                 if (_selectedDeviceId == null)
                 {
                     // YENİ CİHAZ EKLEME
@@ -76,7 +142,7 @@ namespace ITMonitor.View
                         IpOrUrl = ipOrUrl,
                         Category = category,
                         Method = method,
-                        Description = description, // YENİ EKLENEN SATIR
+                        Description = description,
                         IsActive = true
                     };
                     context.Devices.Add(newDevice);
@@ -92,7 +158,7 @@ namespace ITMonitor.View
                         device.IpOrUrl = ipOrUrl;
                         device.Category = category;
                         device.Method = method;
-                        device.Description = description; // YENİ EKLENEN SATIR
+                        device.Description = description;
                         CustomMessageBox.Show("Cihaz bilgileri güncellendi!", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
@@ -101,6 +167,7 @@ namespace ITMonitor.View
             }
 
             ClearForm();
+            await LoadCategoriesAsync(); // Yeni bir kategori yazıldıysa ComboBox listesine eklenmesi için listeyi tazele
             await LoadDevicesAsync(TxtSearch.Text);
         }
 
@@ -117,23 +184,14 @@ namespace ITMonitor.View
                     var device = await context.Devices.FirstOrDefaultAsync(d => d.Id == deviceId);
                     if (device != null)
                     {
-                        // Formu cihazın bilgileriyle doldur
                         _selectedDeviceId = device.Id;
                         TxtDeviceName.Text = device.Name;
                         TxtIpOrUrl.Text = device.IpOrUrl;
-                        TxtDescription.Text = device.Description; // YENİ EKLENEN SATIR
+                        TxtDescription.Text = device.Description;
 
-                        // Kategoriyi seç
-                        foreach (ComboBoxItem item in CmbCategory.Items)
-                        {
-                            if (item.Content.ToString() == device.Category)
-                            {
-                                CmbCategory.SelectedItem = item;
-                                break;
-                            }
-                        }
+                        // Dinamik kategori olduğu için sadece metni atamak yeterli
+                        CmbCategory.Text = device.Category;
 
-                        // Yöntemi seç
                         foreach (ComboBoxItem item in CmbMethod.Items)
                         {
                             if (item.Content.ToString() == device.Method)
@@ -143,7 +201,6 @@ namespace ITMonitor.View
                             }
                         }
 
-                        // Formun başlığını ve butonunu "Düzenleme" moduna uygun değiştir
                         FormTitleText.Text = "✏️ Cihazı Düzenle";
                         BtnSave.Content = "Güncelle";
                     }
@@ -172,12 +229,12 @@ namespace ITMonitor.View
                         }
                     }
 
-                    // Eğer silinen cihaz o an sağ tarafta düzenleniyorsa formu da temizle
                     if (_selectedDeviceId == deviceId)
                     {
                         ClearForm();
                     }
 
+                    await LoadCategoriesAsync();
                     await LoadDevicesAsync(TxtSearch.Text);
                 }
             }
@@ -193,18 +250,19 @@ namespace ITMonitor.View
             _selectedDeviceId = null;
             TxtDeviceName.Clear();
             TxtIpOrUrl.Clear();
-            TxtDescription.Clear(); // YENİ EKLENEN SATIR
+            TxtDescription.Clear();
             CmbCategory.SelectedIndex = 0;
             CmbMethod.SelectedIndex = 0;
 
             FormTitleText.Text = "Cihaz Detayları";
             BtnSave.Content = "Kaydet";
         }
+
+        // ================= DIŞA/İÇE AKTARMA & OTOMATİK TANI =================
         private void BtnExport_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // 1. Veritabanından mevcut cihazları çek
                 using var db = new AppDbContext();
                 var devices = db.Devices.ToList();
 
@@ -214,24 +272,18 @@ namespace ITMonitor.View
                     return;
                 }
 
-                // 2. Kaydetme penceresi oluştur
                 SaveFileDialog saveFileDialog = new SaveFileDialog
                 {
-                    Filter = "ITMonitor Yedek Dosyası (*.itm)|*.itm", // Özel uzantımız!
+                    Filter = "ITMonitor Yedek Dosyası (*.itm)|*.itm",
                     Title = "Envanteri Dışa Aktar",
-                    FileName = $"ITMonitor_Yedek_{DateTime.Now:yyyyMMdd_HHmmss}.itm" // Örn: ITMonitor_Yedek_20260804_153000.itm
+                    FileName = $"ITMonitor_Yedek_{DateTime.Now:yyyyMMdd_HHmmss}.itm"
                 };
 
-                // 3. Kullanıcı yeri seçip Kaydet'e basarsa:
                 if (saveFileDialog.ShowDialog() == true)
                 {
-                    // Verileri güzel ve okunaklı bir şekilde JSON metnine çevir
                     var options = new JsonSerializerOptions { WriteIndented = true };
                     string jsonString = JsonSerializer.Serialize(devices, options);
-
-                    // Metni dosyaya yazdır
                     File.WriteAllText(saveFileDialog.FileName, jsonString);
-
                     CustomMessageBox.Show("Veriler başarıyla dışa aktarıldı!", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
@@ -240,6 +292,7 @@ namespace ITMonitor.View
                 CustomMessageBox.Show($"Dışa aktarılırken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
         private async void BtnImport_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -258,31 +311,26 @@ namespace ITMonitor.View
                     if (importedDevices != null && importedDevices.Count > 0)
                     {
                         using var db = new AppDbContext();
-
-                        // 1. Veritabanında kayıtlı olan mevcut IP/URL adreslerini (küçük harfe çevirerek) bir listeye alıyoruz
                         var existingIps = db.Devices.Select(d => d.IpOrUrl.ToLower()).ToList();
-                        int addedCount = 0; // Sadece yeni eklenenleri saymak için
+                        int addedCount = 0;
 
                         foreach (var device in importedDevices)
                         {
-                            // 2. Eğer bu IP zaten veritabanında varsa bu adımı atla (continue)
                             if (existingIps.Contains(device.IpOrUrl.ToLower()))
                             {
                                 continue;
                             }
 
-                            // 3. Eğer IP veritabanında yoksa, sıfır kilometre bir ID atayıp listeye ekle
                             device.Id = 0;
                             db.Devices.Add(device);
                             addedCount++;
                         }
 
-                        // Sadece yeni eklenenler varsa veritabanını güncelle
                         if (addedCount > 0)
                         {
                             db.SaveChanges();
 
-                            // Arayüzdeki listeyi yenile
+                            await LoadCategoriesAsync();
                             await LoadDevicesAsync(TxtSearch.Text);
 
                             CustomMessageBox.Show($"{addedCount} yeni cihaz başarıyla içe aktarıldı!\n(Zaten var olan cihazlar atlandı.)", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -303,9 +351,9 @@ namespace ITMonitor.View
                 CustomMessageBox.Show($"İçe aktarılırken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
         private async void BtnAutoDiscover_Click(object sender, RoutedEventArgs e)
         {
-            // IP adresini al ve boşlukları temizle
             string ipAddress = TxtIpOrUrl.Text.Trim();
 
             if (string.IsNullOrEmpty(ipAddress))
@@ -314,20 +362,16 @@ namespace ITMonitor.View
                 return;
             }
 
-            // UX (Kullanıcı Deneyimi): Kullanıcı art arda basmasın diye butonu dondur ve metni değiştir
             BtnAutoDiscover.IsEnabled = false;
             BtnAutoDiscover.Content = "⏳ Taranıyor...";
 
             try
             {
-                // 1. Motoru çağır ve asenkron taramayı başlat
                 SmartScanner scanner = new SmartScanner();
                 string detectedCategory = await scanner.DetectDeviceCategoryAsync(ipAddress);
 
-                // 2. Sonucu ekrandaki Kategori seçiciye (ComboBox) yaz.
                 CmbCategory.Text = detectedCategory;
 
-                // 3. YENİ KISIM: Kategoriye Göre İzleme Yöntemini Otomatik Seç
                 switch (detectedCategory)
                 {
                     case "Windows Sunucu":
@@ -337,7 +381,6 @@ namespace ITMonitor.View
                         CmbMethod.Text = "TCP - SSH (22)";
                         break;
                     case "Veritabanı":
-                        // Veritabanıysa varsayılan olarak en popüler olan MSSQL (1433) seçilsin
                         CmbMethod.Text = "TCP - SQL Server (1433)";
                         break;
                     case "Web Servisi":
@@ -347,11 +390,10 @@ namespace ITMonitor.View
                         CmbMethod.Text = "TCP - Yazıcı (9100)";
                         break;
                     default:
-                        CmbMethod.Text = "Ping (ICMP)"; // Bulamazsa klasik ping
+                        CmbMethod.Text = "Ping (ICMP)";
                         break;
                 }
 
-                // 4. (Bonus) Eğer Cihaz Adı kutusu boşsa, oraya da geçici bir isim önerelim
                 if (string.IsNullOrEmpty(TxtDeviceName.Text))
                 {
                     TxtDeviceName.Text = $"{detectedCategory} ({ipAddress})";
@@ -363,7 +405,6 @@ namespace ITMonitor.View
             }
             finally
             {
-                // 5. İşlem bitince (başarılı da olsa hata da verse) butonu eski haline getir
                 BtnAutoDiscover.IsEnabled = true;
                 BtnAutoDiscover.Content = "🔍 Otomatik Tanı";
             }

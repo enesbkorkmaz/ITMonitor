@@ -51,6 +51,17 @@
                                           IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" 
                                           Template="{StaticResource ComboBoxToggleButton}"/>
 
+                            <!-- Yazı Yazılabilir (IsEditable=True) Mod için TextBox Desteği -->
+                            <TextBox x:Name="PART_EditableTextBox" 
+                                     Style="{x:Null}" 
+                                     HorizontalAlignment="Left" 
+                                     VerticalAlignment="Center" 
+                                     Margin="10,0" 
+                                     Background="Transparent" 
+                                     Foreground="{DynamicResource AppText}" 
+                                     BorderThickness="0" 
+                                     Visibility="Hidden"/>
+
                             <ContentPresenter x:Name="contentTemplate" 
                                               Content="{TemplateBinding SelectionBoxItem}" 
                                               ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" 
@@ -78,6 +89,12 @@
                                 </Border>
                             </Popup>
                         </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEditable" Value="True">
+                                <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="contentTemplate" Property="Visibility" Value="Hidden"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -177,18 +194,8 @@
                             </Style>
                         </StackPanel.Resources>
 
-                        <Button Content="📥 İçe Aktar" 
-                                Width="90" Height="30" 
-                                Margin="0,0,10,0" 
-                                Click="BtnImport_Click" 
-                                Background="#2E8B57" 
-                                Style="{StaticResource RoundedButton}"/>
-
-                        <Button Content="📤 Dışa Aktar" 
-                                Width="90" Height="30" 
-                                Click="BtnExport_Click" 
-                                Background="#4682B4" 
-                                Style="{StaticResource RoundedButton}"/>
+                        <Button Content="📥 İçe Aktar" Width="90" Height="30" Margin="0,0,10,0" Click="BtnImport_Click" Background="#2E8B57" Style="{StaticResource RoundedButton}"/>
+                        <Button Content="📤 Dışa Aktar" Width="90" Height="30" Click="BtnExport_Click" Background="#4682B4" Style="{StaticResource RoundedButton}"/>
                     </StackPanel>
 
                     <Border Grid.Column="3" Background="{DynamicResource AppBackground}" CornerRadius="6" Padding="10,5" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1">
@@ -198,7 +205,6 @@
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Visibility" Value="Hidden"/>
                                         <Style.Triggers>
-                                            <!-- Kutu boşsa yazıyı göster -->
                                             <DataTrigger Binding="{Binding Text, ElementName=TxtSearch}" Value="">
                                                 <Setter Property="Visibility" Value="Visible"/>
                                             </DataTrigger>
@@ -220,7 +226,6 @@
                             <Setter Property="BorderThickness" Value="0"/>
                         </Style>
                     </ListView.Resources>
-
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="Durum" Width="70">
@@ -229,14 +234,11 @@
                                         <Ellipse Width="14" Height="14" HorizontalAlignment="Left" Margin="10,0,0,0">
                                             <Ellipse.Style>
                                                 <Style TargetType="Ellipse">
-                                                    <!-- Varsayılan Renk: Kırmızı (Pasif / Hatalı) -->
                                                     <Setter Property="Fill" Value="#E74C3C"/>
                                                     <Style.Triggers>
-                                                        <!-- Aktifse: Yeşil Yap -->
                                                         <DataTrigger Binding="{Binding IsActive}" Value="True">
                                                             <Setter Property="Fill" Value="#2ECC71"/>
                                                         </DataTrigger>
-                                                        <!-- Henüz hiç taranmadıysa (LastScanTime Null ise): Sarı Yap -->
                                                         <DataTrigger Binding="{Binding LastScanTime}" Value="{x:Null}">
                                                             <Setter Property="Fill" Value="#F1C40F"/>
                                                         </DataTrigger>
@@ -256,9 +258,7 @@
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
-                                            <Button Click="BtnEdit_Click" Tag="{Binding Id}" Margin="0,0,6,0" Padding="8,4" 
-                                                    Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}" 
-                                                    BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" Cursor="Hand">
+                                            <Button Click="BtnEdit_Click" Tag="{Binding Id}" Margin="0,0,6,0" Padding="8,4" Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" Cursor="Hand">
                                                 <Button.Resources>
                                                     <Style TargetType="Border">
                                                         <Setter Property="CornerRadius" Value="4"/>
@@ -270,9 +270,7 @@
                                                 </StackPanel>
                                             </Button>
 
-                                            <Button Click="BtnDelete_Click" Tag="{Binding Id}" Padding="8,4" 
-                                                    Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}" 
-                                                    BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" Cursor="Hand">
+                                            <Button Click="BtnDelete_Click" Tag="{Binding Id}" Padding="8,4" Background="{DynamicResource AppBackground}" Foreground="{DynamicResource AppText}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" Cursor="Hand">
                                                 <Button.Resources>
                                                     <Style TargetType="Border">
                                                         <Setter Property="CornerRadius" Value="4"/>
@@ -308,11 +306,9 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-
                     <Border Grid.Column="0" Background="{DynamicResource AppBackground}" CornerRadius="6" Height="35" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" Margin="0,0,8,0">
                         <TextBox x:Name="TxtIpOrUrl" Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0" Padding="10,0" VerticalContentAlignment="Center"/>
                     </Border>
-
                     <Button Grid.Column="1" x:Name="BtnAutoDiscover" Click="BtnAutoDiscover_Click" Content="🔍 Otomatik Tanı" Height="35" Padding="12,0" Background="#FF9500" Foreground="White" FontWeight="SemiBold" FontSize="12" BorderThickness="0" Cursor="Hand">
                         <Button.Style>
                             <Style TargetType="Button">
@@ -334,18 +330,10 @@
                         </Button.Style>
                     </Button>
                 </Grid>
+
                 <TextBlock Text="Kategori" Foreground="{DynamicResource AppText}" Opacity="0.7" FontSize="12" FontWeight="Medium" Margin="0,0,0,5"/>
-                <ComboBox x:Name="CmbCategory" Margin="0,0,0,15">
-                    <ComboBoxItem Content="Sunucu" IsSelected="True"/>
-                    <ComboBoxItem Content="Web Servisi"/>
-                    <ComboBoxItem Content="Ofis Cihazı"/>
-                    <ComboBoxItem Content="Ağ Cihazı (Switch/Router)"/>
-                    <ComboBoxItem Content="Ağ Anahtarı"/>
-                    <ComboBoxItem Content="Güvenlik Duvarı (Firewall)"/>
-                    <ComboBoxItem Content="Yazıcı"/>
-                    <ComboBoxItem Content="Veritabanı Sunucusu"/>
-                    <ComboBoxItem Content="Diğer"/>
-                </ComboBox>
+                <!-- IsEditable="True" YAPARAK ÖZEL KATEGORİ YAZMAYA İZİN VERİYORUZ -->
+                <ComboBox x:Name="CmbCategory" Margin="0,0,0,15" IsEditable="True" ToolTip="Listeden seçebilir veya yeni bir kategori yazabilirsiniz"/>
 
                 <TextBlock Text="İzleme Yöntemi" Foreground="{DynamicResource AppText}" Opacity="0.7" FontSize="12" FontWeight="Medium" Margin="0,0,0,5"/>
                 <ComboBox x:Name="CmbMethod" Margin="0,0,0,15">
