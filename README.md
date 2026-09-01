@@ -62,7 +62,6 @@ ITMonitor has become a high-performance and modern 'Full-Stack' desktop software
 Future versions aim to add live monitoring of CPU/RAM consumption with WMI (Windows Management Instrumentation) integration, generate topology maps, and include Slack/Discord Webhook notifications.
 
 ### Screenshots
-
   <img src="https://raw.githubusercontent.com/enesbkorkmaz/ITMonitor/refs/heads/master/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202026-08-31%20152740.png" />
   <img src="https://raw.githubusercontent.com/enesbkorkmaz/ITMonitor/refs/heads/master/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202026-08-31%20152658.png" />
 
