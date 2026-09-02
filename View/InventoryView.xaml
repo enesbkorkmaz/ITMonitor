@@ -345,6 +345,7 @@
                     <ComboBoxItem Content="TCP - Uzak Masaüstü (3389)"/>
                     <ComboBoxItem Content="TCP - SSH (22)"/>
                     <ComboBoxItem Content="TCP - Yazıcı (9100)"/>
+                    <ComboBoxItem Content="TCP - Özel Port"/>
                     <ComboBoxItem Content="SNMP (v1/v2c)"/>
                 </ComboBox>
 

@@ -22,7 +22,7 @@ namespace ITMonitor.Models
 
         public DateTime? LastScanTime { get; set; }
 
-        // YENİ EKLENEN ALANLAR:
+
         public long LastResponseTimeMs { get; set; } // Yanıt süresi (Milisaniye)
         public string? LastErrorCode { get; set; } = "OK"; // Hata Kodu / Durumu
 

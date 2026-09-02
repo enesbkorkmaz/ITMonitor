@@ -5,7 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Net.NetworkInformation;
-using System.Net.Sockets; // TCP Port taraması için eklendi
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace ITMonitor.Services
@@ -19,61 +19,70 @@ namespace ITMonitor.Services
 
     public class MonitoringService
     {
-        // Detaylı Kontrol Yapan Metot (YENİ YAPILANDIRMA)
         public async Task<MonitoringResult> CheckDeviceDetailedAsync(Device device)
         {
             var result = new MonitoringResult();
             var sw = Stopwatch.StartNew();
 
-            // Eğer Yöntem boş gelirse (eski veriler vb.) varsayılan olarak Ping at
             string method = device.Method ?? "Ping (ICMP)";
 
             try
             {
-                // 1. TCP Port Kontrolü (Veritabanı, RDP, SSH, Yazıcı)
+                // 1. TCP Port Kontrolü (Özel Port Desteği Eklendi)
                 if (method.StartsWith("TCP"))
                 {
-                    int startIndex = method.IndexOf('(') + 1;
-                    int endIndex = method.IndexOf(')');
+                    int port = 80;
+                    string targetIp = device.IpOrUrl;
 
-                    if (startIndex > 0 && endIndex > startIndex)
+                    if (method == "TCP - Özel Port")
                     {
-                        string portString = method.Substring(startIndex, endIndex - startIndex);
-                        if (int.TryParse(portString, out int port))
+                        var parts = targetIp.Split(':');
+                        targetIp = parts[0];
+                        if (parts.Length > 1)
                         {
-                            using (var client = new TcpClient())
-                            {
-                                var connectTask = client.ConnectAsync(device.IpOrUrl, port);
-                                var timeoutTask = Task.Delay(2000); // 2 saniye cevap vermezse kapalı kabul et
-
-                                if (await Task.WhenAny(connectTask, timeoutTask) == connectTask)
-                                {
-                                    await connectTask; // Olası bağlantı reddi hatasını yakalamak için awaitliyoruz
-                                    sw.Stop();
-                                    result.IsSuccess = true;
-                                    result.ResponseTimeMs = sw.ElapsedMilliseconds;
-                                    result.ErrorCode = $"200 OK (Port {port})";
-                                }
-                                else
-                                {
-                                    sw.Stop();
-                                    result.IsSuccess = false;
-                                    result.ResponseTimeMs = sw.ElapsedMilliseconds;
-                                    result.ErrorCode = $"Timeout (Port {port})";
-                                }
-                            }
-                        }
-                        else
-                        {
-                            throw new Exception("Port numarası okunamadı.");
+                            int.TryParse(parts[1], out port);
                         }
                     }
                     else
                     {
-                        throw new Exception("Geçersiz TCP formatı.");
+                        int startIndex = method.IndexOf('(') + 1;
+                        int endIndex = method.IndexOf(')');
+
+                        if (startIndex > 0 && endIndex > startIndex)
+                        {
+                            string portString = method.Substring(startIndex, endIndex - startIndex);
+                            if (!int.TryParse(portString, out port))
+                                throw new Exception("Port numarası okunamadı.");
+                        }
+                        else
+                        {
+                            throw new Exception("Geçersiz TCP formatı.");
+                        }
+                    }
+
+                    using (var client = new TcpClient())
+                    {
+                        var connectTask = client.ConnectAsync(targetIp, port);
+                        var timeoutTask = Task.Delay(2000);
+
+                        if (await Task.WhenAny(connectTask, timeoutTask) == connectTask)
+                        {
+                            await connectTask;
+                            sw.Stop();
+                            result.IsSuccess = true;
+                            result.ResponseTimeMs = sw.ElapsedMilliseconds;
+                            result.ErrorCode = $"200 OK (Port {port})";
+                        }
+                        else
+                        {
+                            sw.Stop();
+                            result.IsSuccess = false;
+                            result.ResponseTimeMs = sw.ElapsedMilliseconds;
+                            result.ErrorCode = $"Timeout (Port {port})";
+                        }
                     }
                 }
-                // 2. HTTP / HTTPS (Web) Kontrolü
+                // 2. HTTP / HTTPS Kontrolü (401 Yetki Gerekli Desteği Eklendi)
                 else if (method.StartsWith("HTTP"))
                 {
                     using (HttpClient client = new HttpClient())
@@ -86,15 +95,24 @@ namespace ITMonitor.Services
                         HttpResponseMessage response = await client.GetAsync(url);
                         sw.Stop();
 
-                        result.IsSuccess = response.IsSuccessStatusCode;
-                        result.ResponseTimeMs = sw.ElapsedMilliseconds;
-                        result.ErrorCode = result.IsSuccess ? "200 OK" : $"HTTP {(int)response.StatusCode} ({response.StatusCode})";
+                        // 401 Unauthorized ise sistemin ayakta olduğunu kabul et
+                        if (response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                        {
+                            result.IsSuccess = true;
+                            result.ResponseTimeMs = sw.ElapsedMilliseconds;
+                            result.ErrorCode = response.StatusCode == System.Net.HttpStatusCode.Unauthorized ? "Aktif (401 Yetki Gerekli)" : "200 OK";
+                        }
+                        else
+                        {
+                            result.IsSuccess = false;
+                            result.ResponseTimeMs = sw.ElapsedMilliseconds;
+                            result.ErrorCode = $"HTTP {(int)response.StatusCode} ({response.StatusCode})";
+                        }
                     }
                 }
-                // 3. YENİ EKLENEN KISIM: SNMP (Yazıcı Toner Kontrolü)
+                // 3. SNMP Kontrolü
                 else if (method == "SNMP (v1/v2c)")
                 {
-                    // Cihaz ayakta mı diye önce hızlıca Ping atalım
                     using (Ping pingSender = new Ping())
                     {
                         PingReply reply = await pingSender.SendPingAsync(device.IpOrUrl, 1500);
@@ -104,7 +122,6 @@ namespace ITMonitor.Services
                             result.IsSuccess = true;
                             result.ResponseTimeMs = reply.RoundtripTime;
 
-                            // Ping başarılıysa SnmpHelper ile Siyah Toneri oku!
                             string tonerLevel = await SnmpHelper.GetPrinterTonerLevelAsync(device.IpOrUrl);
                             result.ErrorCode = $"Aktif (Toner: {tonerLevel})";
                         }
@@ -127,7 +144,7 @@ namespace ITMonitor.Services
 
                         result.IsSuccess = reply.Status == IPStatus.Success;
                         result.ResponseTimeMs = result.IsSuccess ? reply.RoundtripTime : sw.ElapsedMilliseconds;
-                        result.ErrorCode = reply.Status.ToString(); // Örn: Success, TimedOut
+                        result.ErrorCode = reply.Status.ToString();
                     }
                 }
             }
@@ -149,7 +166,6 @@ namespace ITMonitor.Services
             return result;
         }
 
-        // Tüm cihazları tarayıp hem Device hem DeviceLog tablosuna yazan metot
         public async Task RunAllChecksAsync(Action<string>? logCallback = null)
         {
             using (var context = new AppDbContext())
@@ -159,7 +175,6 @@ namespace ITMonitor.Services
 
                 foreach (var device in devices)
                 {
-                    // İzleme yöntemini de (Ping, TCP vs) loga yazdıralım ki ne yaptığımızı görelim
                     string methodLog = device.Method ?? "Ping";
                     logCallback?.Invoke($"[{DateTime.Now:HH:mm:ss}] 🔄 Kontrol: {device.Name} ({device.IpOrUrl}) [{methodLog}]...");
 
@@ -170,7 +185,6 @@ namespace ITMonitor.Services
                     device.LastResponseTimeMs = checkResult.ResponseTimeMs;
                     device.LastErrorCode = checkResult.ErrorCode;
 
-                    // Geçmiş grafiği için log kaydı ekle
                     context.DeviceLogs.Add(new DeviceLog
                     {
                         DeviceId = device.Id,
@@ -182,8 +196,6 @@ namespace ITMonitor.Services
 
                     if (checkResult.IsSuccess)
                     {
-                        // Eğer başarılıysa ama ekstra bir bilgi taşıyorsa (Örn: "200 OK (Port 3389)" veya "Aktif (Toner: %65)")
-                        // Bunu standart "Success" veya "OK" yazılarından ayırıp ekrana yazdıralım.
                         string extraInfo = "";
                         if (checkResult.ErrorCode != "Success" && checkResult.ErrorCode != "OK")
                         {
@@ -210,7 +222,6 @@ namespace ITMonitor.Services
                 var device = await context.Devices.FirstOrDefaultAsync(d => d.Id == deviceId);
                 if (device != null)
                 {
-                    // Cihazı yeni detaylı sistemle tara
                     var checkResult = await CheckDeviceDetailedAsync(device);
 
                     device.IsActive = checkResult.IsSuccess;
@@ -218,7 +229,6 @@ namespace ITMonitor.Services
                     device.LastResponseTimeMs = checkResult.ResponseTimeMs;
                     device.LastErrorCode = checkResult.ErrorCode;
 
-                    // Grafiklerin bozulmaması için tekil taramayı da geçmişe (Log) kaydet
                     context.DeviceLogs.Add(new DeviceLog
                     {
                         DeviceId = device.Id,

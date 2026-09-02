@@ -3,50 +3,58 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Net.NetworkInformation;
 
-namespace ITMonitor.Services 
+namespace ITMonitor.Services
 {
     public class SmartScanner
     {
         /// Verilen IP adresinin portlarını tarayarak cihaz kategorisini tahmin eder.
-             public async Task<string> DetectDeviceCategoryAsync(string ipAddress)
+        public async Task<string> DetectDeviceCategoryAsync(string ipAddress)
         {
+            // YENİ: Eğer kullanıcı IP kısmına "10.0.10.115:8080" gibi özel bir port yazdıysa,
+            // TcpClient'ın hata vermemesi için sadece IP kısmını (10.0.10.115) ayıralım.
+            string targetIp = ipAddress;
+            if (targetIp.Contains(":"))
+            {
+                targetIp = targetIp.Split(':')[0];
+            }
+
             // 1. Veritabanı Kontrolü (SQL Server, PostgreSQL, MySQL)
-            if (await IsPortOpenAsync(ipAddress, 1421) ||
-                await IsPortOpenAsync(ipAddress, 1433) ||
-                await IsPortOpenAsync(ipAddress, 5432) ||
-                await IsPortOpenAsync(ipAddress, 3306))
+            if (await IsPortOpenAsync(targetIp, 1421) ||
+                await IsPortOpenAsync(targetIp, 1433) ||
+                await IsPortOpenAsync(targetIp, 5432) ||
+                await IsPortOpenAsync(targetIp, 3306))
             {
                 return "Veritabanı";
             }
 
             // 2. Windows Sunucu Kontrolü (RDP Portu)
-            if (await IsPortOpenAsync(ipAddress, 3389))
+            if (await IsPortOpenAsync(targetIp, 3389))
             {
                 return "Windows Sunucu";
             }
 
             // 3. Yazıcı Kontrolü (Raw Print veya LPD Portu)
-            if (await IsPortOpenAsync(ipAddress, 9100) ||
-                await IsPortOpenAsync(ipAddress, 515))
+            if (await IsPortOpenAsync(targetIp, 9100) ||
+                await IsPortOpenAsync(targetIp, 515))
             {
                 return "Yazıcı";
             }
 
             // 4. Linux veya Ağ Cihazı (Switch/Router) Kontrolü (SSH Portu)
-            if (await IsPortOpenAsync(ipAddress, 22))
+            if (await IsPortOpenAsync(targetIp, 22))
             {
                 return "Ağ Cihazı / Linux";
             }
 
             // 5. Web Servisi veya Kamera Kontrolü (HTTP / HTTPS)
-            if (await IsPortOpenAsync(ipAddress, 80) ||
-                await IsPortOpenAsync(ipAddress, 443))
+            if (await IsPortOpenAsync(targetIp, 80) ||
+                await IsPortOpenAsync(targetIp, 443))
             {
                 return "Web Servisi";
             }
 
             // 6. Hiçbir port cevap vermedi ama cihaz ping'e yanıt veriyor mu?
-            if (await IsPingSuccessfulAsync(ipAddress))
+            if (await IsPingSuccessfulAsync(targetIp))
             {
                 return "Bilinmeyen Cihaz (Açık)";
             }

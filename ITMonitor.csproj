@@ -8,7 +8,7 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Images\icon.ico</ApplicationIcon>
   
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
     <Product>ITMonitor</Product>
     <Company></Company>
     <Authors>Enes Burak Korkmaz</Authors>

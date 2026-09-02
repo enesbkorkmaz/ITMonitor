@@ -24,10 +24,8 @@ namespace ITMonitor.View
         {
             InitializeComponent();
             DataContext = this;
-            // DİKKAT: SetupTimer() buradan silindi. Artık sayfa yüklendiğinde (Loaded) çağrılacak.
         }
 
-        // YENİ EKLENEN: Ayarlara Göre Dinamik Çalışan Timer
         private async Task SetupTimerAsync()
         {
             // 1. Eğer halihazırda çalışan bir timer varsa durdur 
