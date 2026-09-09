@@ -7,11 +7,8 @@ namespace ITMonitor.Services
 {
     public class SmartScanner
     {
-        /// Verilen IP adresinin portlarını tarayarak cihaz kategorisini tahmin eder.
         public async Task<string> DetectDeviceCategoryAsync(string ipAddress)
         {
-            // YENİ: Eğer kullanıcı IP kısmına "10.0.10.115:8080" gibi özel bir port yazdıysa,
-            // TcpClient'ın hata vermemesi için sadece IP kısmını (10.0.10.115) ayıralım.
             string targetIp = ipAddress;
             if (targetIp.Contains(":"))
             {
