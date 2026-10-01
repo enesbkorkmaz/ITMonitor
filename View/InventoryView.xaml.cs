@@ -98,7 +98,6 @@ namespace ITMonitor.View
             string name = TxtDeviceName.Text.Trim();
             string ipOrUrl = TxtIpOrUrl.Text.Trim();
 
-            // Artık IsEditable=True olduğu için seçilen değil, "yazılan/seçilen" Text'i doğrudan okuyoruz
             string category = string.IsNullOrWhiteSpace(CmbCategory.Text) ? "Diğer" : CmbCategory.Text.Trim();
 
             string method = (CmbMethod.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "Ping (ICMP)";
@@ -112,25 +111,22 @@ namespace ITMonitor.View
 
             using (var context = new AppDbContext())
             {
-                // --- YENİ EKLENEN: MÜKERRER IP KONTROLÜ ---
+                //  MÜKERRER IP KONTROLÜ 
                 bool ipExists = false;
 
                 if (_selectedDeviceId == null)
                 {
-                    // YENİ EKLEME: Veritabanında bu IP'ye sahip herhangi bir kayıt var mı?
                     ipExists = await context.Devices.AnyAsync(d => d.IpOrUrl.ToLower() == ipOrUrl.ToLower());
                 }
                 else
                 {
-                    // GÜNCELLEME: Düzenlenen bu cihaz "hariç" başka bir cihazda bu IP kullanılmış mı?
                     ipExists = await context.Devices.AnyAsync(d => d.IpOrUrl.ToLower() == ipOrUrl.ToLower() && d.Id != _selectedDeviceId);
                 }
 
                 if (ipExists)
                 {
                     CustomMessageBox.Show("Bu IP Adresi veya URL zaten envanterde kayıtlı! Lütfen farklı bir adres girin.", "Mükerrer Kayıt", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return; // IP varsa kaydetme işlemini anında durdur
-                }
+                    return; 
                 // ------------------------------------------
 
                 if (_selectedDeviceId == null)
@@ -167,7 +163,7 @@ namespace ITMonitor.View
             }
 
             ClearForm();
-            await LoadCategoriesAsync(); // Yeni bir kategori yazıldıysa ComboBox listesine eklenmesi için listeyi tazele
+            await LoadCategoriesAsync(); 
             await LoadDevicesAsync(TxtSearch.Text);
         }
 
@@ -189,7 +185,6 @@ namespace ITMonitor.View
                         TxtIpOrUrl.Text = device.IpOrUrl;
                         TxtDescription.Text = device.Description;
 
-                        // Dinamik kategori olduğu için sadece metni atamak yeterli
                         CmbCategory.Text = device.Category;
 
                         foreach (ComboBoxItem item in CmbMethod.Items)

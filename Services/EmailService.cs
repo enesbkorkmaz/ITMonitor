@@ -16,7 +16,7 @@ namespace ITMonitor.Services
         {
             try
             {
-                // 1. ADIM: RAPOR ÖNCESİ SİSTEMİ GÜNCELLE (TAZE VERİ)
+                // 1. ADIM: RAPOR ÖNCESİ SİSTEMİ GÜNCELLE 
                 try
                 {
                     var monitoringService = new ITMonitor.Services.MonitoringService();
@@ -47,10 +47,8 @@ namespace ITMonitor.Services
                         return (false, "Geçerli e-posta alıcısı bulunamadı! Lütfen Ayarlar sayfasından en az bir alıcı ekleyin.");
 
                     // 4. ADIM: GÜNCEL HATALI CİHAZLARI ÇEK VE PDF'İ OLUŞTUR
-                    // Tarama yapıldığı için en güncel hatalı cihaz listesi gelecek
                     var offlineDevices = await context.Devices.Where(d => d.IsActive == false).ToListAsync();
 
-                    // YENİ SİSTEM: Uzun QuestPDF kodları yerine merkezi PdfReportGenerator'ı çağırıyoruz
                     var pdfDocument = ITMonitor.Services.PdfReportGenerator.CreatePdfDocument(offlineDevices);
                     pdfDocument.GeneratePdf(tempPdfPath); // Oluşturulan tabloyu geçici dosyaya kaydet
 
@@ -59,7 +57,6 @@ namespace ITMonitor.Services
                     {
                         mail.From = new MailAddress(settings.SmtpEmail, "ITMonitor Tarama Raporu");
 
-                        // To (Ana alıcı) alanının boş kalmaması için gönderici adresini yazıyoruz
                         mail.To.Add(settings.SmtpEmail);
 
                         mail.Subject = $"ITMonitor Güncel Durum Raporu - {DateTime.Now:dd.MM.yyyy HH:mm}";
@@ -74,7 +71,6 @@ namespace ITMonitor.Services
                             }
                         }
 
-                        // Hazırladığımız PDF'i e-postaya ekliyoruz
                         mail.Attachments.Add(new Attachment(tempPdfPath));
 
                         // SMTP ile gönderim
@@ -88,7 +84,6 @@ namespace ITMonitor.Services
                 }
 
                 // 6. ADIM: TEMİZLİK
-                // E-posta gönderildikten sonra Windows'un Temp klasöründe çöp bırakmamak için PDF'i siliyoruz
                 if (File.Exists(tempPdfPath)) File.Delete(tempPdfPath);
 
                 return (true, "Rapor başarıyla tüm alıcılara gönderildi!");

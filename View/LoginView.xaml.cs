@@ -12,7 +12,6 @@ using System.Windows.Media;
 namespace ITMonitor.View
 {
     /// <summary>
-    /// LoginView.xaml etkileşim mantığı
     /// </summary>
     public partial class LoginView : Window
     {
@@ -32,10 +31,9 @@ namespace ITMonitor.View
             }
         }
 
-        // --- GİRİŞ YAP BUTONU (ANİMASYONLU VE ASENKRON) ---
+        // --- GİRİŞ YAP BUTONU 
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            // Tasarımdaki gerçek isimlerinle (UserTextBox ve PassPasswordBox) verileri alıyoruz
             string username = UserTextBox.Text.Trim();
             string password = PassPasswordBox.Password;
 
@@ -46,19 +44,18 @@ namespace ITMonitor.View
                 return;
             }
 
-            // --- ANİMASYON / BEKLEME EKRANI BAŞLANGICI ---
-            var btn = sender as Button; // Tıklanan butonu alıyoruz
-            if (btn != null) btn.IsEnabled = false; // Butonu kilitle (çift tıklamayı önler)
+            // BEKLEME EKRANI 
+            var btn = sender as Button; 
+            if (btn != null) btn.IsEnabled = false; 
 
             BtnText.Visibility = Visibility.Collapsed; // "Giriş Yap" yazısını gizle
             LoadingSpinner.Visibility = Visibility.Visible; // Dönen çemberi göster
 
             try
             {
-                // Veritabanı Şifre Kontrolü (Arka planda donmadan yapılır)
+                // Veritabanı Şifre Kontrolü 
                 using (var context = new ITMonitor.Data.AppDbContext())
                 {
-                    // YENİ SİSTEM: Giren kişiyi Users tablosundan bul
                     var user = await context.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
 
                     // Kullanıcı bulunduysa VE şifresi eşleşiyorsa
@@ -68,7 +65,7 @@ namespace ITMonitor.View
                         user.IsLoggedIn = true;
                         await context.SaveChangesAsync();
 
-                        // 2. Kullanıcı adını sistemin hafızasına (AppState) al
+                        // 2. Kullanıcı adını sistemin hafızasına al
                         AppState.CurrentUser = user.Username;
 
                         // 3. Giriş Başarılı -> Ana Pencereyi Aç
@@ -81,7 +78,7 @@ namespace ITMonitor.View
                     else
                     {
                         CustomMessageBox.Show("Kullanıcı adı veya şifre hatalı!", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
-                        PassPasswordBox.Clear(); // Hatalı şifre girildiğinde şifre kutusunu temizler
+                        PassPasswordBox.Clear(); 
 
                         // --- HATALI GİRİŞTE BUTONU VE ANİMASYONU ESKİ HALİNE GETİR ---
                         if (btn != null) btn.IsEnabled = true;
@@ -119,7 +116,6 @@ namespace ITMonitor.View
         // --- TEMA DEĞİŞTİRME BUTONU ---
         private void ThemeButton_Click(object sender, RoutedEventArgs e)
         {
-            // XAML'deki şablonun içerisindeki simge elemanlarına erişiyoruz
             TextBlock themeIcon = (TextBlock)ThemeButton.Template.FindName("themeIcon", ThemeButton);
             TextBlock minIcon = (TextBlock)MinimizeButton.Template.FindName("minIcon", MinimizeButton);
             TextBlock closeIcon = (TextBlock)CloseButton.Template.FindName("closeIcon", CloseButton);
@@ -127,14 +123,12 @@ namespace ITMonitor.View
             if (isDarkMode)
             {
                 // ----- GÜNDÜZ MODUNA GEÇİŞ -----
-                // Global App.xaml kaynaklarını güncelliyoruz
                 Application.Current.Resources["AppBackground"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFF"));
                 Application.Current.Resources["AppBorder"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DBDBDB"));
                 Application.Current.Resources["AppText"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#333333"));
                 Application.Current.Resources["InputBackground"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F5F5F7"));
                 Application.Current.Resources["LeftPanelBackground"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#ECECEC"));
 
-                // Sağ üst butonların hover efektleri ve renkleri
                 ThemeButton.Tag = "Light";
                 MinimizeButton.Tag = "Light";
 
@@ -148,14 +142,12 @@ namespace ITMonitor.View
             else
             {
                 // ----- GECE MODUNA GEÇİŞ -----
-                // Global App.xaml kaynaklarını güncelliyoruz
                 Application.Current.Resources["AppBackground"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1E1E1E"));
                 Application.Current.Resources["AppBorder"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#333333"));
                 Application.Current.Resources["AppText"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#BBBBBB"));
                 Application.Current.Resources["InputBackground"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2A2A2A"));
                 Application.Current.Resources["LeftPanelBackground"] = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#161617"));
 
-                // Sağ üst butonların hover efektleri ve renkleri
                 ThemeButton.Tag = null;
                 MinimizeButton.Tag = null;
 

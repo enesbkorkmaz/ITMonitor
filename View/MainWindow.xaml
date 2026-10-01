@@ -90,7 +90,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!-- ÜST BAR (Top Bar) -->
+                <!-- ÜST BAR  -->
                 <Grid Grid.Row="0" Background="Transparent">
                     <Border Background="Transparent" MouseDown="TopBar_MouseDown"/>
 
@@ -199,7 +199,6 @@
                     </StackPanel>
                 </Grid>
 
-                <!-- ANA İÇERİK ALANI -->
                 <ContentControl Grid.Row="1" x:Name="MainContentArea" Margin="20"/>
 
             </Grid>

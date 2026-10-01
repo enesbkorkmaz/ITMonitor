@@ -13,7 +13,7 @@ namespace ITMonitor.Services
     {
         public static Document CreatePdfDocument(List<Device> offlineDevices)
         {
-            // QuestPDF Lisans ayarı (Topluluk sürümü)
+            // QuestPDF Lisans ayarı 
             QuestPDF.Settings.License = LicenseType.Community;
 
             return Document.Create(container =>
@@ -21,10 +21,9 @@ namespace ITMonitor.Services
                 container.Page(page =>
                 {
                     page.Size(PageSizes.A4);
-                    page.Margin(1.5f, Unit.Centimetre); // Marjları biraz daralttık
+                    page.Margin(1.5f, Unit.Centimetre); 
                     page.PageColor(Colors.White);
-                    page.DefaultTextStyle(x => x.FontSize(9).FontFamily("Arial")); // Yazı boyutunu 11'den 9'a düşürdük
-
+                    page.DefaultTextStyle(x => x.FontSize(9).FontFamily("Arial")); 
                     // --- BAŞLIK (HEADER) ---
                     page.Header().BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingBottom(5).Row(row =>
                     {
@@ -50,10 +49,8 @@ namespace ITMonitor.Services
                             x.Item().Text($"Dikkat: Ağınızda bağlantısı kopan toplam {offlineDevices.Count} adet cihaz tespit edildi.")
                                 .FontSize(10).FontColor(Colors.Red.Medium).SemiBold();
 
-                            // MODERN TABLO GÖRÜNÜMÜ
                             x.Item().PaddingTop(10).Table(table =>
                             {
-                                // Sütun Genişlikleri
                                 table.ColumnsDefinition(columns =>
                                 {
                                     columns.RelativeColumn(2); // Cihaz Adı

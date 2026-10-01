@@ -51,7 +51,6 @@
                                           IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" 
                                           Template="{StaticResource ComboBoxToggleButton}"/>
 
-                            <!-- Yazı Yazılabilir (IsEditable=True) Mod için TextBox Desteği -->
                             <TextBox x:Name="PART_EditableTextBox" 
                                      Style="{x:Null}" 
                                      HorizontalAlignment="Left" 
@@ -332,7 +331,6 @@
                 </Grid>
 
                 <TextBlock Text="Kategori" Foreground="{DynamicResource AppText}" Opacity="0.7" FontSize="12" FontWeight="Medium" Margin="0,0,0,5"/>
-                <!-- IsEditable="True" YAPARAK ÖZEL KATEGORİ YAZMAYA İZİN VERİYORUZ -->
                 <ComboBox x:Name="CmbCategory" Margin="0,0,0,15" IsEditable="True" ToolTip="Listeden seçebilir veya yeni bir kategori yazabilirsiniz"/>
 
                 <TextBlock Text="İzleme Yöntemi" Foreground="{DynamicResource AppText}" Opacity="0.7" FontSize="12" FontWeight="Medium" Margin="0,0,0,5"/>

@@ -12,7 +12,6 @@ namespace ITMonitor.View
             InitializeComponent();
         }
 
-        // Pencereyi Sürükleme
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
@@ -43,7 +42,6 @@ namespace ITMonitor.View
             Close();
         }
 
-        // ================= STATİK KULLANIM METODU =================
         public static MessageBoxResult Show(string message, string title = "Bildirim", MessageBoxButton button = MessageBoxButton.OK, MessageBoxImage icon = MessageBoxImage.Information)
         {
             var msgBox = new CustomMessageBox();
@@ -57,17 +55,16 @@ namespace ITMonitor.View
                     msgBox.TxtIcon.Text = "✅"; // Başarılı / Bilgi
                     break;
                 case MessageBoxImage.Error:
-                    msgBox.TxtIcon.Text = "❌"; // Hata
+                    msgBox.TxtIcon.Text = "❌"; 
                     break;
                 case MessageBoxImage.Warning:
-                    msgBox.TxtIcon.Text = "⚠️"; // Uyarı
+                    msgBox.TxtIcon.Text = "⚠️"; 
                     break;
                 case MessageBoxImage.Question:
-                    msgBox.TxtIcon.Text = "❓"; // Soru
+                    msgBox.TxtIcon.Text = "❓"; 
                     break;
             }
 
-            // BUTON DÜZENİ AYARLAMA
             switch (button)
             {
                 case MessageBoxButton.OK:
@@ -88,7 +85,6 @@ namespace ITMonitor.View
                     break;
             }
 
-            // Eğer ana pencere açık ise onun tam ortasında çıkar
             if (Application.Current.MainWindow != null && Application.Current.MainWindow.IsVisible)
             {
                 msgBox.Owner = Application.Current.MainWindow;

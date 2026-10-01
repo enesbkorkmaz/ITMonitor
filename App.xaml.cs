@@ -15,7 +15,6 @@ namespace ITMonitor
 
             try
             {
-                // 1. Önce veritabanını oluştur ve admini ekle
                 using (var context = new AppDbContext())
                 {
                     context.Database.EnsureCreated();
@@ -31,13 +30,10 @@ namespace ITMonitor
                     }
                 }
 
-                // 2. Ekran açılmadan ÖNCE eski cihaz durumlarını ve logları temizle
                 ResetAllDeviceStatuses();
 
-                // 3. Otomasyon motorunu başlat
                 ReportSchedulerService.Instance.Start();
 
-                // 4. Auto-login kontrolü: IsLoggedIn = true olan bir kullanıcı var mı?
                 Window startupWindow;
 
                 using (var context = new AppDbContext())
@@ -46,7 +42,6 @@ namespace ITMonitor
 
                     if (loggedInUser != null)
                     {
-                        // Kim giriş yapmışsa, AppState'e onu yükle
                         AppState.CurrentUser = loggedInUser.Username;
                         startupWindow = new MainWindow();
                     }
@@ -72,16 +67,14 @@ namespace ITMonitor
             {
                 using (var db = new AppDbContext())
                 {
-                    // 1. Cihaz durumlarını sıfırla
                     var allDevices = db.Devices.ToList();
                     foreach (var device in allDevices)
                     {
                         device.IsActive = false;
-                        device.LastScanTime = null; // Sarı yapar
-                        device.LastErrorCode = null; // Eski hata kodunu siler
+                        device.LastScanTime = null; 
+                        device.LastErrorCode = null; 
                     }
 
-                    // 2. Geçmiş grafikleri besleyen Ping Loglarını tamamen sil!
                     var allLogs = db.DeviceLogs.ToList();
                     if (allLogs.Any())
                     {

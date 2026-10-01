@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public string Username { get; set; } = "admin";
-        public string Password { get; set; } = "admin"; // Varsayılan ilk şifren
+        public string Password { get; set; } = "admin"; 
         public bool IsLoggedIn { get; set; } = false;
     }
 }

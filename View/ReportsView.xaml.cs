@@ -221,7 +221,6 @@ namespace ITMonitor.View
                                         });
                                     });
 
-                                    // DÜZELTİLDİ: Padding komutları Text'ten önceye alındı
                                     col.Item().PaddingTop(20).PaddingBottom(5).Text("2. Ağ Durum Grafiği (Aktif / Pasif Dağılımı)").FontSize(14).SemiBold().FontColor(Colors.Blue.Darken2);
 
                                     // YATAY BAR GRAFİĞİ (STACKED BAR CHART)
@@ -236,7 +235,6 @@ namespace ITMonitor.View
                                             row.RelativeItem(offlineCount).Background(Colors.Red.Medium).AlignCenter().AlignMiddle().Text($"%{(offlineCount * 100) / totalCount} Hatalı").FontColor(Colors.White).SemiBold();
                                     });
 
-                                    // DÜZELTİLDİ: Padding komutları Text'ten önceye alındı
                                     col.Item().PaddingTop(25).PaddingBottom(10).Text("3. Tüm Envanter Listesi").FontSize(14).SemiBold().FontColor(Colors.Blue.Darken2);
 
                                     // DETAYLI TABLO

@@ -16,18 +16,16 @@ namespace ITMonitor.View
             BtnDashboard.IsChecked = true;
         }
 
-        // Pencereyi üst bardan tutup sürüklemek için
         private void TopBar_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
             {
-                // Tam ekrandayken sürüklenirse normal boyuta ve yuvarlak köşelere döndür
                 if (this.WindowState == WindowState.Maximized)
                 {
                     this.WindowState = WindowState.Normal;
                     MainBorder.BorderThickness = new Thickness(1);
-                    MainBorder.CornerRadius = new CornerRadius(12); // Dış çerçeveyi yuvarlat
-                    LeftPanelBorder.CornerRadius = new CornerRadius(11, 0, 0, 11); // Sol menüyü yuvarlat
+                    MainBorder.CornerRadius = new CornerRadius(12); 
+                    LeftPanelBorder.CornerRadius = new CornerRadius(11, 0, 0, 11); 
                 }
                 this.DragMove();
             }
@@ -40,21 +38,20 @@ namespace ITMonitor.View
 
         private void MaximizeButton_Click(object sender, RoutedEventArgs e)
         {
-            // Eğer pencere zaten tam ekransa normal boyuta al
             if (this.WindowState == WindowState.Maximized)
             {
                 this.WindowState = WindowState.Normal;
                 MainBorder.BorderThickness = new Thickness(1);
-                MainBorder.CornerRadius = new CornerRadius(12); // Dış çerçeveyi yuvarlat
-                LeftPanelBorder.CornerRadius = new CornerRadius(11, 0, 0, 11); // Sol menüyü yuvarlat
+                MainBorder.CornerRadius = new CornerRadius(12); 
+                LeftPanelBorder.CornerRadius = new CornerRadius(11, 0, 0, 11); 
             }
             else
             {
                 // Tam ekran yap
                 this.WindowState = WindowState.Maximized;
-                MainBorder.BorderThickness = new Thickness(0); // Tam ekranda sınırı gizle
-                MainBorder.CornerRadius = new CornerRadius(0); // Dış çerçeveyi köşeli yap
-                LeftPanelBorder.CornerRadius = new CornerRadius(0); // Sol menüyü köşeli yap
+                MainBorder.BorderThickness = new Thickness(0); 
+                MainBorder.CornerRadius = new CornerRadius(0); 
+                LeftPanelBorder.CornerRadius = new CornerRadius(0); 
             }
         }
 
@@ -104,7 +101,7 @@ namespace ITMonitor.View
                 if (user != null)
                 {
                     user.IsLoggedIn = false;
-                    await context.SaveChangesAsync(); // Değişikliği veritabanına yaz
+                    await context.SaveChangesAsync(); 
                 }
             }
 
@@ -125,13 +122,11 @@ namespace ITMonitor.View
         }
         private void MenuButton_Checked(object sender, RoutedEventArgs e)
         {
-            // Arayüz henüz tam yüklenmediyse hata vermemesi için güvenlik kontrolü
             if (MainContentArea == null) return;
 
             var selectedButton = sender as RadioButton;
             if (selectedButton == null) return;
 
-            // Hangi butona tıklandığına göre ilgili sayfayı (UserControl) MainContentArea içine gömüyoruz
             switch (selectedButton.Name)
             {
                 case "BtnDashboard":

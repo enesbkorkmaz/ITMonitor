@@ -87,7 +87,6 @@ namespace ITMonitor.View
         }
 
         // --- TÜM AYARLARI KAYDETME ---
-        // --- TÜM AYARLARI KAYDETME ---
         private async void BtnSaveSettings_Click(object sender, RoutedEventArgs e)
         {
             BtnSaveSettings.Content = "⏳ Kaydediliyor...";
@@ -110,7 +109,6 @@ namespace ITMonitor.View
 
                     setting.IsAutoReportEnabled = ChkAutoReport.IsChecked ?? false;
 
-                    // HATA DÜZELTİLDİ: Menüden hiçbir şey seçilmemişse bile kod çökmeyecek
                     var selectedType = CmbScheduleType.SelectedItem as ComboBoxItem;
                     setting.ReportScheduleType = selectedType != null && selectedType.Tag != null
                                                  ? selectedType.Tag.ToString()

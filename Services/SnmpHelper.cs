@@ -31,17 +31,14 @@ namespace ITMonitor.Services
 
                     if (result.Count >= 2)
                     {
-                        // Gelen değerleri string'den integer'a çeviriyoruz
                         int maxCapacity = int.Parse(result[0].Data.ToString());
                         int currentLevel = int.Parse(result[1].Data.ToString());
 
-                        // Eğer toner bitmişse veya okunamıyorsa bazı yazıcılar -1 veya -3 döndürür
                         if (currentLevel < 0 || maxCapacity <= 0)
                         {
                             return "Durum Bilinmiyor";
                         }
 
-                        // Yüzde hesaplama
                         int percentage = (currentLevel * 100) / maxCapacity;
                         return $"% {percentage}";
                     }
@@ -50,7 +47,7 @@ namespace ITMonitor.Services
                 }
                 catch
                 {
-                    return "Erişim Yok"; // SNMP kapalıysa veya cihaz cevap vermezse
+                    return "Erişim Yok"; 
                 }
             });
         }

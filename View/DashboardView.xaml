@@ -18,13 +18,12 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Column="0" Text="📊 Sistem Özeti" Foreground="{DynamicResource AppText}" FontSize="24" FontWeight="SemiBold" FontFamily="Segoe UI" VerticalAlignment="Center"/>
+            <TextBlock Grid.Column="0" Text=" Sistem Özeti" Foreground="{DynamicResource AppText}" FontSize="24" FontWeight="SemiBold" FontFamily="Segoe UI" VerticalAlignment="Center"/>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                 <ProgressBar x:Name="ScanProgressBar" Width="100" Height="6" Margin="0,0,15,0" IsIndeterminate="True" Visibility="Hidden" Foreground="#007AFF" BorderThickness="0" Background="Transparent"/>
 
-                <!-- DÜZELTİLDİ: WPF'in varsayılan pasifleşme(beyazlama) huyunu ControlTemplate ile ezdik -->
-                <Button x:Name="BtnStartScan" Click="BtnStartScan_Click" Content="🚀 Taramayı Başlat" Height="41" Padding="15,0" Foreground="White" FontWeight="SemiBold" FontSize="13" BorderThickness="0" Cursor="Hand" Width="125">
+                <Button x:Name="BtnStartScan" Click="BtnStartScan_Click" Content=" Taramayı Başlat" Height="41" Padding="15,0" Foreground="White" FontWeight="SemiBold" FontSize="13" BorderThickness="0" Cursor="Hand" Width="125">
                     <Button.Style>
                         <Style TargetType="Button">
                             <Setter Property="Background" Value="#007AFF"/>
@@ -133,7 +132,6 @@
                         <ItemsControl x:Name="CriticalDevicesControl">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <!-- DÜZELTİLDİ: Background Dinamik yapıldı, Kırmızı tonu her iki modda okunabilen #FF4757 yapıldı -->
                                     <Border Background="{DynamicResource AppBackground}" BorderBrush="#FF4757" BorderThickness="1" CornerRadius="8" Padding="10" Margin="0,0,0,8">
                                         <Grid>
                                             <Grid.ColumnDefinitions>

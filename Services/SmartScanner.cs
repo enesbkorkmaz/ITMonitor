@@ -50,16 +50,15 @@ namespace ITMonitor.Services
                 return "Web Servisi";
             }
 
-            // 6. Hiçbir port cevap vermedi ama cihaz ping'e yanıt veriyor mu?
+            // 6. Ping kontrolü
             if (await IsPingSuccessfulAsync(targetIp))
             {
                 return "Bilinmeyen Cihaz (Açık)";
             }
 
-            return "Bağlantı Yok"; // Cihaz tamamen kapalı veya güvenlik duvarı her şeyi engelliyor
+            return "Bağlantı Yok"; 
         }
 
-        /// Belirli bir porta Asenkron TCP bağlantısı dener (Timeout mekanizması içerir).
         private async Task<bool> IsPortOpenAsync(string ipAddress, int port, int timeoutMs = 2000)
         {
             try
@@ -75,23 +74,19 @@ namespace ITMonitor.Services
 
                     if (completedTask == timeoutTask)
                     {
-                        // Zaman aşımı oldu, port büyük ihtimalle kapalı veya filtrelenmiş
                         return false;
                     }
 
-                    // Eğer connectTask bittiyse (bağlandıysa) exception fırlatmaması için await'liyoruz
                     await connectTask;
                     return true;
                 }
             }
             catch
             {
-                // Bağlantı reddedildi (Port kapalı)
                 return false;
             }
         }
 
-        /// Klasik Ping testi (Fallback olarak kullanılır)
         private async Task<bool> IsPingSuccessfulAsync(string ipAddress)
         {
             try

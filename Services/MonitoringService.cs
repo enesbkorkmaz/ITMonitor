@@ -28,7 +28,7 @@ namespace ITMonitor.Services
 
             try
             {
-                // 1. TCP Port Kontrolü (Özel Port Desteği Eklendi)
+                // 1. TCP Port Kontrolü 
                 if (method.StartsWith("TCP"))
                 {
                     int port = 80;
@@ -82,7 +82,7 @@ namespace ITMonitor.Services
                         }
                     }
                 }
-                // 2. HTTP / HTTPS Kontrolü (401 Yetki Gerekli Desteği Eklendi)
+                // 2. HTTP / HTTPS Kontrolü 
                 else if (method.StartsWith("HTTP"))
                 {
                     using (HttpClient client = new HttpClient())
@@ -171,7 +171,7 @@ namespace ITMonitor.Services
             using (var context = new AppDbContext())
             {
                 var devices = await context.Devices.ToListAsync();
-                logCallback?.Invoke($"[{DateTime.Now:HH:mm:ss}] 🚀 Tarama başlatıldı. ({devices.Count} Cihaz)");
+                logCallback?.Invoke($"[{DateTime.Now:HH:mm:ss}]  Tarama başlatıldı. ({devices.Count} Cihaz)");
 
                 foreach (var device in devices)
                 {
@@ -211,7 +211,7 @@ namespace ITMonitor.Services
                 }
 
                 await context.SaveChangesAsync();
-                logCallback?.Invoke($"[{DateTime.Now:HH:mm:ss}] 🎉 Tarama tamamlandı.");
+                logCallback?.Invoke($"[{DateTime.Now:HH:mm:ss}] Tarama tamamlandı.");
             }
         }
 

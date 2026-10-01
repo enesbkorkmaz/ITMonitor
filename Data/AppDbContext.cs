@@ -27,7 +27,7 @@ namespace ITMonitor.Data
             Directory.CreateDirectory(appDataPath);
 
             string dbPath = Path.Combine(appDataPath, "ITMonitor.db");
-
+Ğ
             optionsBuilder.UseSqlite($"Data Source={dbPath}");
         }
     }

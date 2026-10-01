@@ -8,10 +8,8 @@
              Background="Transparent"
              Loaded="UserControl_Loaded">
 
-    <!-- TÜM SAYFADA KULLANILACAK MODERN TASARIM ŞABLONLARI -->
     <UserControl.Resources>
 
-        <!-- YUVARLAK VE MODERN BUTON ŞABLONU -->
         <Style TargetType="Button" x:Key="FlatRoundedButton">
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -35,7 +33,6 @@
             </Setter>
         </Style>
 
-        <!-- MODERN COMBOBOX ŞABLONU -->
         <Style TargetType="ComboBox">
             <Setter Property="Background" Value="{DynamicResource AppBackground}"/>
             <Setter Property="Foreground" Value="{DynamicResource AppText}"/>
@@ -95,7 +92,6 @@
             </Setter>
         </Style>
 
-        <!-- MODERN TABLO BAŞLIĞI ŞABLONU (Envanter sayfasından uyarlandı) -->
         <Style TargetType="GridViewColumnHeader">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="{DynamicResource AppText}"/>
@@ -128,7 +124,6 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- BAŞLIK -->
             <StackPanel Grid.Row="0" Margin="0,0,0,20">
                 <TextBlock Text="⚙️ Sistem ve Otomasyon Ayarları" FontSize="26" FontWeight="Bold" Foreground="{DynamicResource AppText}"/>
                 <TextBlock Text="Ağ tarama periyotlarını, e-posta otomasyonunu, SMTP ve hesap şifrenizi yönetin." 
@@ -142,10 +137,8 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- SOL SÜTUN -->
                 <StackPanel Grid.Column="0">
 
-                    <!-- OTOMATİK TARAMA -->
                     <Border Background="{DynamicResource InputBackground}" CornerRadius="12" Padding="20" Margin="0,0,0,15">
                         <StackPanel>
                             <TextBlock Text="🔍 Otomatik Ağ Taraması" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppText}" Margin="0,0,0,15"/>
@@ -158,7 +151,6 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- OTOMATİK RAPORLAMA -->
                     <Border Background="{DynamicResource InputBackground}" CornerRadius="12" Padding="20" Margin="0,0,0,15">
                         <StackPanel>
                             <TextBlock Text="📅 Otomatik Raporlama" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppText}" Margin="0,0,0,15"/>
@@ -188,7 +180,6 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- SMTP AYARLARI -->
                     <Border Background="{DynamicResource InputBackground}" CornerRadius="12" Padding="20" Margin="0,0,0,20">
                         <StackPanel>
                             <TextBlock Text="✉️ SMTP Sunucu Ayarları" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppText}" Margin="0,0,0,15"/>
@@ -221,10 +212,8 @@
 
                 </StackPanel>
 
-                <!-- SAĞ SÜTUN -->
                 <StackPanel Grid.Column="2">
 
-                    <!-- ALICI LİSTESİ -->
                     <Border Background="{DynamicResource InputBackground}" CornerRadius="12" Padding="20" Margin="0,0,0,15">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -255,7 +244,6 @@
                                 <Button x:Name="BtnAddEmail" Grid.Column="4" Content="Ekle" Click="BtnAddEmail_Click" Background="#3498DB" Height="35" Style="{StaticResource FlatRoundedButton}"/>
                             </Grid>
 
-                            <!-- LİSTE YAPISI -->
                             <ListView x:Name="EmailList" Grid.Row="2" Background="Transparent" BorderThickness="0" MinHeight="200" MaxHeight="250" ScrollViewer.HorizontalScrollBarVisibility="Auto">
                                 <ListView.Resources>
                                     <Style TargetType="ListViewItem">
@@ -270,7 +258,6 @@
                                         <GridViewColumn Header="Ad Soyad" Width="130" DisplayMemberBinding="{Binding Name}"/>
                                         <GridViewColumn Header="E-Posta Adresi" Width="190" DisplayMemberBinding="{Binding EmailAddress}"/>
 
-                                        <!-- ENVANTER SAYFASINDAN UYARLANAN SİL BUTONU -->
                                         <GridViewColumn Header="İşlemler" Width="100">
                                             <GridViewColumn.CellTemplate>
                                                 <DataTemplate>
@@ -297,7 +284,6 @@
                         </Grid>
                     </Border>
 
-                    <!-- ŞİFRE DEĞİŞTİRME -->
                     <Border Background="{DynamicResource InputBackground}" CornerRadius="12" Padding="20">
                         <StackPanel>
                             <TextBlock Text="🔑 Şifreyi Değiştir" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource AppText}" Margin="0,0,0,15"/>

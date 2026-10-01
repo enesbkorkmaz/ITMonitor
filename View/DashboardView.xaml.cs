@@ -120,7 +120,6 @@ namespace ITMonitor.View
             });
         }
 
-        // TÜM GRAFİKLERİ VE KRİTİK LİSTEYİ BESLEYEN ANA METOT
         private async Task LoadDashboardStatsAsync()
         {
             using (var context = new AppDbContext())
@@ -160,7 +159,7 @@ namespace ITMonitor.View
                     }
                 };
 
-                // 3. ÇİZGİ GRAFİK (SON PİNG TRENLERİ)
+                // 3. ÇİZGİ GRAFİK 
                 var recentLogs = await context.DeviceLogs
                     .OrderByDescending(l => l.Timestamp)
                     .Take(10)

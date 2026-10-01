@@ -13,21 +13,20 @@ namespace ITMonitor.Services
         public static ReportSchedulerService Instance => _instance ??= new ReportSchedulerService();
 
         private Timer? _timer;
-        private DateTime _lastSentTime = DateTime.MinValue; // Aralıklı gönderim takibi
-        private DateTime _lastSentDate = DateTime.MinValue; // Sabit saat gönderimi takibi (Aynı gün 2 kez atmamak için)
-        private bool _isProcessing = false; // Çakışmaları önlemek için kilit
+        private DateTime _lastSentTime = DateTime.MinValue; 
+        private DateTime _lastSentDate = DateTime.MinValue; 
+        private bool _isProcessing = false; 
 
         private ReportSchedulerService() { }
 
         public void Start()
         {
-            // Arka planda her 1 dakikada bir kontrol yapacak sayacı başlatıyoruz
             _timer = new Timer(async (e) => await CheckAndSendReportAsync(), null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
         }
 
         private async Task CheckAndSendReportAsync()
         {
-            if (_isProcessing) return; // Zaten işlem yapıyorsa yeni kontrolü atla
+            if (_isProcessing) return; 
             _isProcessing = true;
 
             try
@@ -80,7 +79,7 @@ namespace ITMonitor.Services
             }
             catch (Exception)
             {
-                // Arka plan işlemlerinde uygulama çökmesin diye hataları yutuyoruz veya logluyoruz
+            
             }
             finally
             {

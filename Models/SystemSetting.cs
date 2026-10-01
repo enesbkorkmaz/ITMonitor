@@ -28,10 +28,10 @@ namespace ITMonitor.Models
         // Gönderim Tipi: "Interval" (Aralıklı) veya "FixedTime" (Sabit Saat)
         public string ReportScheduleType { get; set; } = "Interval";
 
-        // Eğer aralıklı seçildiyse kaç saatte bir gönderilecek? (Örn: 1, 2, 12)
+        // Eğer aralıklı seçildiyse kaç saatte bir gönderilecek? 
         public int ReportIntervalHours { get; set; } = 1;
 
-        // Eğer sabit saat seçildiyse hangi saatte gönderilecek? (Örn: "08:00", "17:30")
+        // Eğer sabit saat seçildiyse hangi saatte gönderilecek? 
         public string ReportFixedTime { get; set; } = "17:00";
     }
 }

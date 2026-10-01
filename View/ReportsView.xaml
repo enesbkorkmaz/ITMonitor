@@ -65,15 +65,11 @@
         </Style>
     </UserControl.Resources>
 
-    <!-- GÜNCELLENEN KISIM: Dış ScrollViewer kaldırıldı. Ana Grid, taşma koruması olan margin (40) ile pencereye tam oturtuldu. -->
     <Grid Margin="20,20,20,40">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- Başlık Satırı -->
             <RowDefinition Height="*"/>
-            <!-- Liste Satırı (Kendi içinde kaydırılabilir alan) -->
             <RowDefinition Height="Auto"/>
-            <!-- Sabit Buton Satırı -->
         </Grid.RowDefinitions>
 
         <!-- BAŞLIK VE ARAMA KUTUSU -->
@@ -110,7 +106,6 @@
         </Grid>
 
         <!-- RAPOR ÖNİZLEME LİSTESİ -->
-        <!-- Grid.Row="1" ve Height="*" sayesinde bu alan kalan boşluğu kaplar ve liste uzadıkça kendi ScrollViewer'ını çalıştırır -->
         <Border Grid.Row="1" Background="{DynamicResource InputBackground}" CornerRadius="12" Padding="15">
             <Grid>
                 <Grid.RowDefinitions>
@@ -134,7 +129,6 @@
         </Border>
 
         <!-- AKSİYON BUTONLARI -->
-        <!-- Bu kısım daima en altta sabit kalacaktır -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
 
             <Button x:Name="BtnExportTxt" Content="📝 TXT Kaydet" Click="BtnExportTxt_Click" 
